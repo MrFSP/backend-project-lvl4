@@ -1,6 +1,6 @@
 module.exports = {
   translation: {
-    appName: 'Fastify Шаблон',
+    appName: 'Task Manager',
     flash: {
       session: {
         create: {

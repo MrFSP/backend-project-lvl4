@@ -22,6 +22,7 @@ import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
 import User from './entity/User.js';
 import Guest from './entity/Guest.js';
+import Rollbar from 'rollbar';
 // import auth from './plugins/auth';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -110,6 +111,20 @@ const registerPlugins = (app) => {
     });
 };
 
+const rollbar = new Rollbar({
+  accessToken: process.env.ROLLBAR,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
+
+rollbar.log('Rollbar started!');
+
+const errorHandler = (app) => {
+  app.setErrorHandler(function (error, request, reply) {
+    rollbar.error(`Error: ${error}`, request, reply);
+  })
+};
+
 export default () => {
   const app = fastify({
     logger: {
@@ -126,6 +141,8 @@ export default () => {
   setUpStaticAssets(app);
   addRoutes(app);
   addHooks(app);
+
+  errorHandler(app);
 
   return app;
 };

@@ -6,3 +6,4 @@ tmp/
 temp/
 database.sqlite
 public/assets
+.env
