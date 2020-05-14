@@ -1,1 +1,1 @@
-web: make start-backend
+npm run-script start
