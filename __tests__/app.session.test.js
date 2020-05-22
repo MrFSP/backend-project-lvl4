@@ -15,6 +15,16 @@ const user = {
   lastName: faker.name.lastName(),
 };
 
+const getCookie = async (server) => {
+  const res = await request.agent(server.server)
+    .post('/session')
+    .send({ object: user })
+    .catch((err) => {
+      console.log(err);
+    });
+  return res.header['set-cookie'];
+};
+
 describe('Testing session for registered user', () => {
   let server;
 
@@ -55,8 +65,18 @@ describe('Testing session for registered user', () => {
       .catch((err) => {
         console.log(err);
       });
+    
+    expect(res).toHaveHTTPStatus(200);
+  });
 
-    console.log(res);
+  it('Should return the current session', async () => {
+    const res = await request.agent(server.server)
+      .get('/users/user')
+      .set('cookie', await getCookie(server))
+      .catch((err) => {
+        console.log(err);
+      });
+    
     expect(res).toHaveHTTPStatus(200);
   });
 
