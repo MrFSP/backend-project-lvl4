@@ -11,8 +11,11 @@ class User extends BaseEntity {
   @IsNotEmpty()
   email = '';
 
-  @IsNotEmpty()
-  password = '';
+  @Column('varchar')
+  firstName = '';
+
+  @Column('varchar')
+  lastName = '';
 
   @Column('varchar')
   @IsNotEmpty()
