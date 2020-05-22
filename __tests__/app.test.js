@@ -3,7 +3,7 @@ import matchers from 'jest-supertest-matchers';
 
 import app from '../server';
 
-describe('Testing responses', () => {
+describe('Testing responses for Guest', () => {
   let server;
 
   beforeAll(async () => {
@@ -28,11 +28,6 @@ describe('Testing responses', () => {
       .get('/users/new');
 
     expect(res3).toHaveHTTPStatus(200);
-
-    const res4 = await request.agent(server.server)
-      .get('/users/new');
-
-    expect(res4).toHaveHTTPStatus(200);
   });
 
   it('should return 404', async () => {
