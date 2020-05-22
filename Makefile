@@ -19,11 +19,13 @@ heroku-start:
 	npm run build-server
 	npm run start
 
-heroku-start1:
-	rm -rf ./dist
-	npm run build-configs
-	npm run build-server
-	npm run start
+hsp:
+	npm run-script start
+
+hsl:
+	npm run build
+	npm run-script start
+
 
 t:
 	npm run test -- --verbose
@@ -43,4 +45,4 @@ hl:
 am:
 	git add .
 	git commit --amend
-	git push -f origin feature/step_1_fastify
+	git push -f origin feature/step_3
