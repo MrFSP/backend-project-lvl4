@@ -26,13 +26,13 @@ heroku-start1:
 	npm run start
 
 t:
-	npx jest --color --colors
+	npm run test -- --verbose
 
 ts:
-	npx jest --silent
+	npm run test -- --verbose --silent --noStackTrace --debug false
 
 tc:
-	npm test -- --coverage -u
+	npm test -- --verbose --silent --coverage
 
 lint:
 	npx eslint .

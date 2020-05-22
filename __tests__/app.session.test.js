@@ -15,6 +15,13 @@ const user = {
   lastName: faker.name.lastName(),
 };
 
+const changedUser = {
+  email: `changed${user.email}`,
+  password: `changed${user.password}`,
+  firstName: `changed${user.firstName}`,
+  lastName: `changed${user.lastName}`,
+};
+
 const getCookie = async (server) => {
   const res = await request.agent(server.server)
     .post('/session')
@@ -63,7 +70,7 @@ describe('Testing session for registered user', () => {
     expect(userFromDb.passwordDigest).toEqual(encrypt(user.password));
   });
 
-  it('Should create a session', async () => {
+  it('Should get new session', async () => {
     const res = await request.agent(server.server)
       .post('/session')
       .send({ object: user })
@@ -95,6 +102,26 @@ describe('Testing session for registered user', () => {
       });
     
     expect(res).toHaveHTTPStatus(200);
+  });
+
+  it('Should get changed password', async () => {
+    await request.agent(server.server)
+      .post('/users/password/index')
+      .set('cookie', await getCookie(server))
+      .send({
+        object: {
+          oldPass: user.password,
+          newPass: changedUser.password,
+          confirmNewPass: changedUser.password,
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const userFromDb = await User.findOne({ where: { email: user.email } });
+
+    expect(userFromDb.passwordDigest).toEqual(encrypt(changedUser.password));
   });
 
   it('Should delete current session', async () => {

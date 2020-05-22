@@ -70,8 +70,7 @@ export default (app) => {
       const user = await app.orm
         .getRepository(User)
         .findOne(userId);
-      const isCorrectOldPassword = encrypt(pass.oldPass) === user.
-      passwordDigest;
+      const isCorrectOldPassword = encrypt(pass.oldPass) === user.passwordDigest;
       if (!isCorrectOldPassword) {
         req.flash('error', i18next.t('flash.users.create.wrongOldPass'));
         return reply.redirect(app.reverse('password'));
