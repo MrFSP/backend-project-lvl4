@@ -6,6 +6,7 @@ module.exports = {
         create: {
           success: 'Вы залогинены',
           error: 'Неправильный емейл или пароль',
+          noAuthorisation: 'Вы ещё не прошли авторизацию',
         },
         delete: {
           success: 'Вы разлогинены',
@@ -15,6 +16,10 @@ module.exports = {
         create: {
           error: 'Не удалось зарегистрировать',
           success: 'Пользователь успешно зарегистрирован',
+          emailExists: 'Пользователь с данным емейлом уже зарегистрирован',
+          wrongOldPass: 'Неверно введён старый пароль',
+          wrongConfirmation: 'Пароли не совпадают',
+          passwordChanged: 'Пароль успешно изменён',
         },
       },
     },
@@ -38,6 +43,31 @@ module.exports = {
           submit: 'Сохранить',
           signUp: 'Регистрация',
         },
+      },
+      user: {
+        delete: {
+          delete: 'Удалить',
+          deleteMessage: 'Вы действительно хотите удалит свой аккаунт? Восстановить его будет невозможно',
+          deleteTitle: 'Удалить профиль?',
+          save: 'Нет, оставить',
+          confirmDelete: 'Да, удалить',
+          accountDeleted: 'Ваш аккаунт успешно удалён',
+        },
+        password: {
+          chPassTitle: 'Изменение пароля',
+          chPass: 'Изменить пароль',
+          back: 'Вернуться',
+          confirmChange: 'Сохранить',
+          passChanged: 'Ваш пароль изменён',
+          oldPass: 'Старый пароль',
+          newPass: 'Новый пароль',
+          confirmNewPass: 'Подтвердите новый пароль',
+        },
+        email: 'email',
+        firstName: 'Имя',
+        lastName: 'Фамилия',
+        accountUpdated: 'Ваш аккаунт обновлён',
+        update: 'Обновить',
       },
       welcome: {
         index: {

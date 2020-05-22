@@ -101,7 +101,7 @@ const registerPlugins = (app) => {
       path: '/',
     },
     // cookie: { secure: false },
-    expires: 7 * 24 * 60 * 60,
+    // expires: 7 * 24 * 60 * 60,
   });
   app.register(fastifyFlash);
   // app.register(auth);

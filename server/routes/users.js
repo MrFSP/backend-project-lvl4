@@ -35,14 +35,13 @@ export default (app) => {
         req.flash('error', i18next.t('flash.session.create.noAuthorisation'));
         return reply.redirect(app.reverse('root'));
       }
-      console.log('Test string');
+
       const user = await app.orm
         .getRepository(User)
         .findOne(userId);
 
       const keys = Object.keys(user)
         .filter((key) => !['passwordDigest', 'id'].includes(key));
-      user['password'] = '';
 
       return reply.render('users/user', { user, keys });
     })
