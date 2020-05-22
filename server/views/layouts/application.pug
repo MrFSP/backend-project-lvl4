@@ -5,29 +5,12 @@ html(lang="en").h-100
   head
   meta(charset='utf-8')
   meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
-  meta(name='description' content='')
   meta(name='author' content='Pavel Egorov')
   meta(name='generator' content='Jekyll v3.8.5')
   title Task Manager
-  link(rel='canonical' href='https://getbootstrap.com/docs/4.3/examples/floating-labels/')
-  link(href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T' crossorigin='anonymous')
-  style.
-    .bd-placeholder-img {
-    font-size: 1.125rem;
-    text-anchor: middle;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    }
-    @media (min-width: 768px) {
-    .bd-placeholder-img-lg {
-    font-size: 3.5rem;
-    }
-    }
+  script(src=assetPath('main.js'))
+  link(href=assetPath('main.css'))
   link(href='https://getbootstrap.com/docs/4.3/examples/floating-labels/floating-labels.css' rel='stylesheet')
-  script(type='text/javascript' src='chrome-extension://aggiiclaiamajehmlfpkjmlbadmkledi/popup.js' async='')
-  script(type='text/javascript' src='chrome-extension://aggiiclaiamajehmlfpkjmlbadmkledi/tat_popup.js' async='')
   body.h-100.d-flex.flex-column
     nav.navbar.navbar-expand-lg.fixed-top.navbar-light.bg-light.mb-3
       a.navbar-brand(href=route('root'))= t('appName')
@@ -40,23 +23,29 @@ html(lang="en").h-100
         ul.navbar-nav
           if reply.request.signedIn
             li.nav-item
+              a.nav-link(
+                        href=route('user')
+                      ) !{reply.request.session.get('userEmail')}
+            li.nav-item
               +buttonTo(route('session'), 'delete')(class="btn nav-link" value=t('layouts.application.signOut'))
           else
             li.nav-item
               a.nav-link(href=route('newSession'))= t('layouts.application.signIn')
             li.nav-item
               a.nav-link(href=route('newUser'))= t('layouts.application.signUp')
-    .container.h-100.d-flex
+    .container.h-100.pt-5
 
       each messages, type in reply.flash() || []
         each message in messages
-          div.alert(class=`alert-${getAlertClass(type)}`)= message
+          .animated.fadeOutUp
+            .d-flex.justify-content-center
+              .row.col-md-auto.alert.text-center.w-auto(class=`alert-${getAlertClass(type)}`)= message
 
-      h1.my-4
+      h1.my-4.text-center
         block header
       block content
 
-    footer.footer.mt-100
+    footer.footer
       .container.my-5.pt-4.border-bottom
       p.mt-5.mb-3.text-muted.text-center
         a.text-align-left(href='https://ru.hexlet.io/u/mrfsp') Pavel Egorov

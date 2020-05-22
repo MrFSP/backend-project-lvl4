@@ -1,18 +1,9 @@
 extends ../layouts/application.pug
 
 block content
-    form.form-signin
-      div.text-center.mb-4
-        h1.h3.mb-3.font-weight-normal Task Manager
-      div.form-label-group
-        input#inputEmail.form-control(type='email' placeholder='Email address' required='' autofocus='')
-        label(for='inputEmail') Email address
-      div.form-label-group
-        input#inputPassword.form-control(type='password' placeholder='Password' required='')
-        label(for='inputPassword') Password
-      div.checkbox.mb-3
-        label
-          input(type='checkbox' value='remember-me')
-          |  Remember me
-      button.btn.btn-lg.btn-primary.btn-block(type='submit') Sign in
-
+  .container.col-3
+    .row.justify-content-center.mt-5.pt-5
+      h1.h3.mb-3.font-weight-normal.text-center Менеджер задач
+      .row.justify-content-center.col-1
+      a.btn.btn-outline-primary.btn-lg.mt-3.mb-3(href=route('newUser')) Зарегистрироваться
+      a.btn.btn-outline-primary.btn-lg(href=route('newSession')) Войти
