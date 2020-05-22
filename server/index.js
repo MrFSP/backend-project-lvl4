@@ -73,6 +73,11 @@ const setupLocalization = (app) => {
     });
 };
 
+const redirectGuests = (app, req, reply) => {
+  req.flash('error', i18next.t('flash.session.create.noAuthorisation'));
+  return reply.redirect(app.reverse('root'));
+};
+
 const addHooks = (app) => {
   app.decorateRequest('currentUser', null);
   app.decorateRequest('signedIn', false);
@@ -85,6 +90,13 @@ const addHooks = (app) => {
       req.signedIn = true;
     } else {
       req.currentUser = new Guest();
+      return [
+        '/users/user',
+        '/users/password',
+        '/users/password/index',
+      ].includes(req.raw.originalUrl)
+      ? redirectGuests(app, req, reply)
+      : null;
     }
   });
 };

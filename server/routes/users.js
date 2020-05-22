@@ -31,10 +31,6 @@ export default (app) => {
     })
     .get('/users/user', { name: 'user' }, async (req, reply) => {
       const userId = req.session.get('userId');
-      if (!userId) {
-        req.flash('error', i18next.t('flash.session.create.noAuthorisation'));
-        return reply.redirect(app.reverse('root'));
-      }
 
       const user = await app.orm
         .getRepository(User)
@@ -53,7 +49,7 @@ export default (app) => {
       const errors = await validate(user);
       if (!_.isEmpty(errors)) {
         req.flash('error', i18next.t('flash.users.create.error'));
-        return reply.render('users/new', { user, errors });
+        return reply.render('/users/new', { user, errors });
       }
       try {
         await user.save();

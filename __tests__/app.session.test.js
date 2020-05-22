@@ -86,6 +86,17 @@ describe('Testing session for registered user', () => {
     expect(res).toHaveHTTPStatus(200);
   });
 
+  it('Should get page for changing password', async () => {
+    const res = await request.agent(server.server)
+      .get('/users/password')
+      .set('cookie', await getCookie(server))
+      .catch((err) => {
+        console.log(err);
+      });
+    
+    expect(res).toHaveHTTPStatus(200);
+  });
+
   it('Should delete current session', async () => {
     const res = await request.agent(server.server)
       .delete('/session')
@@ -94,7 +105,6 @@ describe('Testing session for registered user', () => {
         console.log(err);
       });
     
-    console.log(res.text);
     expect(res).toHaveHTTPStatus(200);
     expect(res.text.toString()).toEqual(logoutPagetml.toString());
   });
