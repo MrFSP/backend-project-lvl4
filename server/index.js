@@ -9,6 +9,7 @@ import fastifyErrorPage from 'fastify-error-page';
 import pointOfView from 'point-of-view';
 import fastifyFormbody from 'fastify-formbody';
 import fastifySecureSession from 'fastify-secure-session';
+import fastifyCookie from 'fastify-cookie';
 import fastifyFlash from 'fastify-flash';
 import fastifyReverseRoutes from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
@@ -77,7 +78,7 @@ const addHooks = (app) => {
   app.decorateRequest('signedIn', false);
 
   // eslint-disable-next-line no-unused-vars
-  app.addHook('preHandler', async (req, _reply) => {
+  app.addHook('preHandler', async (req, reply) => {
     const userId = req.session.get('userId');
     if (userId) {
       req.currentUser = await User.find(userId);
@@ -100,7 +101,7 @@ const registerPlugins = (app) => {
       path: '/',
     },
     // cookie: { secure: false },
-    // expires: 7 * 24 * 60 * 60,
+    expires: 7 * 24 * 60 * 60,
   });
   app.register(fastifyFlash);
   // app.register(auth);

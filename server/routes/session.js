@@ -2,7 +2,7 @@
 
 import i18next from 'i18next';
 import User from '../entity/User.js';
-import encrypt from './../lib/secure.js';
+import encrypt from '../lib/secure.js';
 
 export default (app) => {
   app
@@ -20,12 +20,15 @@ export default (app) => {
       }
 
       req.session.set('userId', user.id);
+      req.session.set('userEmail', user.email);
       req.flash('info', i18next.t('flash.session.create.success'));
       return reply.redirect(app.reverse('root'));
     })
-    .delete('/session', (req, reply) => {
+    .delete('/session', { name: 'deleteSession' }, (req, reply) => {
       req.session.set('userId', null);
+      req.session.set('userEmail', null);
       req.flash('info', i18next.t('flash.session.delete.success'));
+      
       return reply.redirect(app.reverse('root'));
     });
 };

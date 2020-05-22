@@ -35,6 +35,7 @@ export default (app) => {
         req.flash('error', i18next.t('flash.session.create.noAuthorisation'));
         return reply.redirect(app.reverse('root'));
       }
+      console.log('Test string');
       const user = await app.orm
         .getRepository(User)
         .findOne(userId);
@@ -42,6 +43,7 @@ export default (app) => {
       const keys = Object.keys(user)
         .filter((key) => !['passwordDigest', 'id'].includes(key));
       user['password'] = '';
+
       return reply.render('users/user', { user, keys });
     })
     .post('/users', async (req, reply) => {
@@ -98,9 +100,6 @@ export default (app) => {
     .post('/users/user', { name: 'userUpdate' }, async (req, reply) => {
       const user = req.body.user;
       const userId = req.session.get('userId');
-      console.log('useruser');
-      console.log(user);
-      console.log(userId);
       await app.orm
         .createQueryBuilder()
         .update(User)
