@@ -31,6 +31,9 @@ t:
 ts:
 	npx jest --silent
 
+tc:
+	npm test -- --coverage -u
+
 lint:
 	npx eslint .
 

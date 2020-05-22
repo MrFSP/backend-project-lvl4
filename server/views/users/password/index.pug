@@ -1,0 +1,21 @@
+extends ../../layouts/application.pug
+
+block content
+  .container.col-4.justify-content-center
+    .d-flex.flex-column
+      h1.h3.mb-3.font-weight-normal.text-center Изменение пароля
+      +formToChangeUserData()(
+                action=route('userUpdatePassword')
+                method='post'
+                id="data"
+              )
+        each key in passKeys
+          +inputToChangePass(pass, key)
+    .d-flex.justify-content-between
+      a.btn.btn-link(
+                href=route('user'),
+                method='get',
+              )= t('views.user.password.back')
+      button.btn.btn-link(
+                form='data'
+              )=t('views.user.password.confirmChange')
