@@ -32,7 +32,7 @@ describe('Testing session for registered user', () => {
 
   // });
 
-  it('user should be registered', async () => {
+  it('User should be registered', async () => {
     await request.agent(server.server)
       .post('/users')
       .set('Content-Type', 'application/json')
@@ -45,6 +45,19 @@ describe('Testing session for registered user', () => {
 
     expect(userFromDb.email).toEqual(user.email);
     expect(userFromDb.passwordDigest).toEqual(encrypt(user.password));
+  });
+
+  it('Should create a session', async () => {
+    const res = await request.agent(server.server)
+      .post('/session')
+      .send({ object: user })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    console.log(res);
+    expect(res).toHaveHTTPStatus(200);
   });
 
   afterAll(async () => {
