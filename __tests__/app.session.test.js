@@ -25,10 +25,16 @@ const getCookie = async (server) => {
   return res.header['set-cookie'];
 };
 
+const pathToFixtures = path.join(__dirname, '__fixtures__');
+
+let logoutPagetml;
+
 describe('Testing session for registered user', () => {
   let server;
 
   beforeAll(async () => {
+    logoutPagetml = await fs.readFile(path.join(pathToFixtures, 'logout-page.html'));
+
     expect.extend(matchers);
     server = app();
     await server.ready();
@@ -69,7 +75,7 @@ describe('Testing session for registered user', () => {
     expect(res).toHaveHTTPStatus(200);
   });
 
-  it('Should return the current session', async () => {
+  it('Should return current session', async () => {
     const res = await request.agent(server.server)
       .get('/users/user')
       .set('cookie', await getCookie(server))
@@ -78,6 +84,19 @@ describe('Testing session for registered user', () => {
       });
     
     expect(res).toHaveHTTPStatus(200);
+  });
+
+  it('Should delete current session', async () => {
+    const res = await request.agent(server.server)
+      .delete('/session')
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+    
+    console.log(res.text);
+    expect(res).toHaveHTTPStatus(200);
+    expect(res.text.toString()).toEqual(logoutPagetml.toString());
   });
 
   afterAll(async () => {
