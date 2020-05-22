@@ -7,15 +7,6 @@ prepare:
 start:
 	heroku local -f Procfile.dev
 
-sa:
-	npm run build
-	npm run start
-
-rb:
-	rm -rf ./dist
-	npm run build-configs
-	npm run build-server
-
 start-backend:
 	npx nodemon --exec npx babel-node server/bin/server.js
 
@@ -33,6 +24,15 @@ heroku-start1:
 	npm run build-configs
 	npm run build-server
 	npm run start
+
+t:
+	npm run test -- --verbose
+
+ts:
+	npm run test -- --verbose --silent --noStackTrace --debug false
+
+tc:
+	npm test -- --verbose --silent --coverage
 
 lint:
 	npx eslint .

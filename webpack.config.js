@@ -13,6 +13,9 @@ module.exports = {
   devServer: {
     host: 'localhost',
     port: 5001,
+  },   
+  resolve: {
+    extensions: ['.js', '.cjs', '.json', '.jsx', '.css']
   },
   module: {
     rules: [
@@ -23,7 +26,12 @@ module.exports = {
       },
       {
         test: /\.s[ac]ss$/i,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
+        use: [
+          'style-loader',
+          'css-loader',
+          'resolve-url-loader',
+          'sass-loader',
+        ],
       },
       {
         test: /\.jsx?$/,

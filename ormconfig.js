@@ -1,6 +1,10 @@
+const pathToDb = process.env.NODE_ENV !== 'test'
+  ? `${__dirname}/database.sqlite`
+  : `${__dirname}/__tests__/database.sqlite`;
+
 export default {
   type: 'sqlite',
-  database: `${__dirname}/database.sqlite`,
+  database: pathToDb,
   synchronize: true,
   logger: 'debug',
   logging: true,

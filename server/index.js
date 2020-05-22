@@ -9,6 +9,7 @@ import fastifyErrorPage from 'fastify-error-page';
 import pointOfView from 'point-of-view';
 import fastifyFormbody from 'fastify-formbody';
 import fastifySecureSession from 'fastify-secure-session';
+import fastifyCookie from 'fastify-cookie';
 import fastifyFlash from 'fastify-flash';
 import fastifyReverseRoutes from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
@@ -72,18 +73,30 @@ const setupLocalization = (app) => {
     });
 };
 
+const redirectGuests = (app, req, reply) => {
+  req.flash('error', i18next.t('flash.session.create.noAuthorisation'));
+  return reply.redirect(app.reverse('root'));
+};
+
 const addHooks = (app) => {
   app.decorateRequest('currentUser', null);
   app.decorateRequest('signedIn', false);
 
   // eslint-disable-next-line no-unused-vars
-  app.addHook('preHandler', async (req, _reply) => {
+  app.addHook('preHandler', async (req, reply) => {
     const userId = req.session.get('userId');
     if (userId) {
       req.currentUser = await User.find(userId);
       req.signedIn = true;
     } else {
       req.currentUser = new Guest();
+      return [
+        '/users/user',
+        '/users/password',
+        '/users/password/index',
+      ].includes(req.raw.originalUrl)
+      ? redirectGuests(app, req, reply)
+      : null;
     }
   });
 };

@@ -7,3 +7,5 @@ temp/
 database.sqlite
 public/assets
 .env
+coverage
+dist
