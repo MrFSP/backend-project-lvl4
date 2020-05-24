@@ -74,7 +74,7 @@ describe('Testing session for registered user', () => {
     const res = await request.agent(server.server)
       .post('/session')
       .send({ object: user })
-      .redirects(1)
+      .redirects(2)
       .catch((err) => {
         console.log(err);
       });
