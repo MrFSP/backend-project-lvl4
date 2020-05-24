@@ -31,6 +31,13 @@ module.exports = {
         signOut: 'Выход',
       },
     },
+    tasks: {
+      settings: {
+        newTag: 'Добавить тег',
+        newTaskStatus: 'Добавить статус',
+        add: 'Добавить',
+      }
+    },
     views: {
       session: {
         new: {

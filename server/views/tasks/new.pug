@@ -1,0 +1,57 @@
+extends ../layouts/application.pug
+
+block content
+  .container.col-6.justify-content-center
+    h3.mb-3.font-weight-normal.text-center Новая задача
+    form#task(action=route('newTaskPost') method='post')
+      .form-group
+        label(for='FormControlInput1') Название задачи
+        input#FormControlInput1.form-control.data-bv-notempty-message(
+                                              name='task[name]'
+                                              autocomplete='off'
+                                              )
+      label(for='inlineFormCustomSelect') Статус
+      .form-group.d-flex.pb-2
+        select#inlineFormCustomSelect.col-md-4.form-control(name='task[status]')
+          each taskStatus in taskStatuses
+            option.form-control(value=taskStatus.name)= t(`${taskStatus.name}`)
+        a.btn.btn-link(
+                href=route('settings'),
+                method='get',
+              ) Добавить
+      label Теги
+      .form-group.justify-content-between.mb-0
+        each tag in tags
+          input.ml-2.mr-2(type='checkbox' name='tagsForTask[name]' value=tag.name)
+          label= t(`${tag.name}`)
+        a.h6.btn-link.ml-2(
+                  href=route('settings'),
+                  method='get',
+                ) Добавить
+        
+      .form-group
+        textarea.form-control(
+                  name='task[description]'
+                  rows="6"
+                  placeholder='Введите описание задачи'
+                  )
+      .form-group
+        select#inlineFormCustomSelect.w-100.form-control(
+                  name='task[assignedTo]'
+                  required=''
+                  )
+          option(selected='' disabled='') Ответственный
+          each user in users
+            option.form-control(
+                    name='assignedTo[id]'
+                    value=user.id
+                  )= t(`${user.firstName || ''} ${user.lastName || ''} ${user.email}`)
+    hr
+    .d-flex.justify-content-between
+      a.btn.btn-link(
+                href=route('tasks'),
+                method='get',
+              ) Вернуться к задачам
+      button.btn.btn-link(
+                form='task'
+              ) Создать задачу

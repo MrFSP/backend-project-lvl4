@@ -1,0 +1,41 @@
+extends ../../layouts/application.pug
+
+mixin list(items)
+  table.table.table-striped.table-bordered.table-sm
+    each item in items
+      tr
+        td= t(`${item.name}`)
+
+
+block content
+  .container.col-md-4.justify-content-center
+    h3.mb-3.font-weight-normal.text-center Настройки
+    form#tagSettings(action=route('addTag') method='post')
+      .text-center
+        h5 Теги
+        +list(tags)
+      .form-group
+        label(for='formControlInput') Добавить тег
+        input#formControlInput.form-control(name='newTag[name]' autocomplete='off')
+    .d-flex
+      button.btn.btn-block.btn-outline-primary(
+                form='tagSettings'
+              ) Добавить
+    hr
+    form#taskStatus(action=route('addTaskStatus') method='post')
+      .form-group
+        .text-center
+          h5 Статусы
+          +list(taskStatuses)
+        label(for='formControlInput') Добавить статус
+        input#formControlInput.form-control(name='newTaskStatus[name]' autocomplete='off')
+    .d-flex
+      button.btn.btn-block.btn-outline-primary(
+                form='taskStatus'
+              ) Добавить
+    hr
+    .d-flex.mb-3
+      a.btn.btn-block.btn-primary(
+                href=route('newTask'),
+                method='get',
+              ) Вернуться
