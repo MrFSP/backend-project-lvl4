@@ -93,6 +93,28 @@ describe('Testing session for registered user', () => {
     expect(res).toHaveHTTPStatus(200);
   });
 
+  it('Should get page "create new task"', async () => {
+    const res = await request.agent(server.server)
+      .get('/tasks/new')
+      .set('cookie', await getCookie(server))
+      .catch((err) => {
+        console.log(err);
+      });
+    
+    expect(res).toHaveHTTPStatus(200);
+  });
+
+  it('Should get page "task settings"', async () => {
+    const res = await request.agent(server.server)
+      .get('/tasks/settings')
+      .set('cookie', await getCookie(server))
+      .catch((err) => {
+        console.log(err);
+      });
+    
+    expect(res).toHaveHTTPStatus(200);
+  });
+
   it('Should get page for changing password', async () => {
     const res = await request.agent(server.server)
       .get('/users/password')
