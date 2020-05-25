@@ -3,7 +3,33 @@ extends ../layouts/application.pug
 block content
   .container.col-10.justify-content-center
     h3.mb-3.font-weight-normal.text-center Список задач
-    a.nav-link(href=route('newTask')) Создать задачу
+    .d-flex.justify-content-between
+      a.nav-link(href=route('newTask')) Создать задачу
+      .btn.btn-link.collapsed(data-toggle='collapse' data-target='#collapseForm' aria-expanded='false' aria-controls='collapseForm') Фильтры
+    #collapseForm.collapse.pb-2
+      .col
+        form.row(action=route('filterTasks') method='post' id='filterForm')
+          .form-group.col-md-4.mb-2
+            select.form-control(name='filter[assignedTo]')
+              option.form-control(selected='' disabled='' value='') Кому
+              each user in Object.values(users)
+                option.form-control(value=user.id)= t(`${user.fullName}`)
+          .form-group.col-md-4.mb-2
+            select.form-control(name='filter[taskStatus]')
+              option.form-control(selected='' disabled='' value='') Статус
+              each taskStatus in taskStatuses
+                option.form-control(value=taskStatus.name)= t(`${taskStatus.name}`)
+          .form-group.col-md-4.mb-2
+            select.form-control(name='filter[tag]')
+              option.form-control(selected='' disabled='' value='') Тег
+              each tag in tags
+                option.form-control(value=tag.id)= t(`${tag.name}`)
+          //- .form-group
+          //-   input.form-control(type='hidden' value=tasks)
+        .row.justify-content-end
+          button.btn.btn-outline-primary.mb-1.mr-3(
+              form='filterForm',
+            ) Применить
     each task in tasks
       div(id=`accordion${task.id}`)
         .card
@@ -12,28 +38,27 @@ block content
               .mb-0
                 .btn.btn-link.collapsed(data-toggle='collapse' data-target=`#collapse${task.id}` aria-expanded='false' aria-controls=`collapse${task.id}`)= t(task.name)
               span.d-flex.align-items-center
-                .badge.badge-info.ml-1.mr-1 !{task.status}
+                .badge.badge-primary.ml-1.mr-1() !{task.status}
               .d-flex.align-items-center
-                h6.ml-2.mb-0 Кому: !{users[task.assignedTo]}
+                h6.ml-2.mb-0 Кому: !{users[task.assignedTo].fullName}
             .row.ml-0.mr-0
               span.d-flex.align-items-center
                 each tag in task.tags
                   .badge.badge-pill.badge-success.ml-1.mr-1 !{tag.name}
               button.nav-link.btn.btn-sm.btn-link.text-danger(type='submit' form=`formForTask${task.id}`)= t('Удалить')
-                form(action=route('deleteTask'), method="post" id=`formForTask${task.id}`)
-                  input(name='taskID' value=`${task.id}` type="hidden")
+                form(action=route('deleteTask'), method='post' id=`formForTask${task.id}`)
+                  input(name='taskID' value=`${task.id}` type='hidden')
           .collapse(aria-labelledby=`heading${task.id}` data-parent=`#accordion${task.id}` id=`collapse${task.id}`)
             .card-body.mt-0.pt-2.p.pb-0 !{task.description}
             .card-body.pb-1
               .d-flex.justify-content-end
-                h6 Автор: !{users[task.creator]}
+                h6 Автор: !{users[task.creator].fullName}
                 
-    #accordion
-      .card
-        #headingOne.card-header
-          h5.mb-0
-            button.btn.btn-link.collapsed(data-toggle='collapse' data-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne') Контрольный шаблон
-        #collapseOne.collapse(aria-labelledby='headingOne' data-parent='#accordion')
-          .card-body
-            | Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven&apos;t heard of them accusamus labore sustainable VHS.
-          
+    //- #accordion
+    //-   .card
+    //-     #headingOne.card-header
+    //-       h5.mb-0
+    //-         button.btn.btn-link.collapsed(data-toggle='collapse' data-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne') Контрольный шаблон
+    //-     #collapseOne.collapse(aria-labelledby='headingOne' data-parent='#accordion')
+    //-       .card-body
+    //-         | Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven&apos;t heard of them accusamus labore sustainable VHS.

@@ -11,33 +11,78 @@ import Tag from '../entity/Tag.js';
 import { access } from 'fs';
 // import { buildFromObj, buildFromModel } from '../lib/formObjectBuilder';
 
+const getUsers = async (app) => {
+  const usersFromDB = await app.orm
+        .getRepository(User)
+        .find();
+  return usersFromDB.reduce((acc, user) => {
+    const value = [user.firstName || '',
+      user.LastName || '',
+      user.email,
+    ].join(' ').replace(/ +/g, ' ').trim();
+    user.fullName = value;
+    user.passwordDigest = ''
+    return { ...acc, [user.id]: user };
+  }, {});
+};
+
+const filterTasks = (tasks, filter) => {
+  if (!filter) {
+    return tasks;
+  }
+  if (filter.assignedTo) {
+    tasks = tasks.filter((task) => task.assignedTo === filter.assignedTo);
+  }
+  if (filter.taskStatus) {
+    tasks = tasks.filter((task) => task.status === filter.taskStatus);
+  }
+  console.log('tagstags');
+  console.log(tasks[0].tags);
+  if (filter.tag) {
+    tasks = tasks.filter((task) => {
+      const taskTags = task.tags;
+      return taskTags.find((tag) => tag.id == filter.tag);
+    });
+  }
+  return tasks;
+};
+
 export default (app) => {
   app
     .get('/tasks/index', { name: 'tasks' }, async (req, reply) => {
-      const userId = req.session.get('userId');
-      // const tasks = await app.orm.getRepository(Task).find();
-      
       const tasks = await app.orm
         .getRepository(Task)
         .createQueryBuilder("task")
         .leftJoinAndSelect("task.tags", "tag")
         .getMany();
-      // console.log(tasks);
-      const usersFromDB = await app.orm
-        .getRepository(User)
-        .find();
-      const users = usersFromDB.reduce((acc, user) => {
-          const key = `${user.id}`;
-          const value = [user.firstName || '',
-            user.LastName || '',
-            user.email,
-          ].join(' ').replace(/ +/g, ' ').trim();
-          return { ...acc, [key]: value };
-        }, {});
 
-      console.log(users);
+      const users = await getUsers(app);
 
-      return reply.render('tasks/index', { tasks, users });
+      const taskStatuses = await app.orm.getRepository(TaskStatus).find();
+      const tags = await app.orm.getRepository(Tag).find();
+
+      return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
+    })
+    .post('/tasks/index', { name: 'filterTasks' }, async (req, reply) => {
+      const { filter } = req.body;
+      console.log('filter');
+      console.log(filter);
+      const allTasks = await app.orm
+        .getRepository(Task)
+        .createQueryBuilder("task")
+        .leftJoinAndSelect("task.tags", "tag")
+        .getMany();
+
+      console.log(allTasks);
+      
+      const tasks = filterTasks(allTasks, filter);
+
+      const users = await getUsers(app);
+
+      const taskStatuses = await app.orm.getRepository(TaskStatus).find();
+      const tags = await app.orm.getRepository(Tag).find();
+
+      return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
       const userId = req.session.get('userId');
@@ -148,7 +193,7 @@ export default (app) => {
       }
       return reply.redirect(app.reverse('settings'));
     })
-    .post('/tasks/index', { name: 'deleteTask'}, async (req, reply) => {
+    .post('/tasks/deleteTask', { name: 'deleteTask'}, async (req, reply) => {
       console.log('bodybody');
       console.log(req.body);
       const taskID = req.body.taskID;
