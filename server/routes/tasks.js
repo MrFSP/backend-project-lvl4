@@ -177,8 +177,10 @@ export default (app) => {
           { tags, taskStatuses, newTaskStatus, newTag },
         );
     })
-    .post('/tasks/settings/addTag', { name: 'addTag' }, async (req, reply) => {
+    .post('/tasks/settings/addtag', { name: 'addTag' }, async (req, reply) => {
       const { newTag } = req.body;
+      console.log('req.bodyreq.body');
+      console.log(req.body);
       const isTagExists = await app.orm
         .getRepository(Tag)
         .findOne({ name: newTag.name })
@@ -197,7 +199,7 @@ export default (app) => {
       }
       return reply.redirect(app.reverse('settings'));
     })
-    .post('/tasks/settings/addTaskStatus', { name: 'addTaskStatus' }, async (req, reply) => {
+    .post('/tasks/settings/addtaskstatus', { name: 'addTaskStatus' }, async (req, reply) => {
       const { newTaskStatus } = req.body;
       const isTaskStatusExists = await app.orm
         .getRepository(TaskStatus)
