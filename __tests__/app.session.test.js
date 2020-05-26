@@ -125,6 +125,41 @@ describe('Testing session for registered user', () => {
     expect(res.text.toString()).toEqual(newTaskPagehtml.toString());
   });
 
+  it('Should set new tag', async () => {
+    const successResponse1 = await request.agent(server.server)
+      .post('/tasks/settings/addtag')
+      .send({ newTag: newTag })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const successResponse2 = await request.agent(server.server)
+      .post('/tasks/settings/addtag')
+      .send({ newTag: newTag })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const successResponse3 = await request.agent(server.server)
+      .post('/tasks/settings/addtag')
+      .send({ newTag: { name: '' } })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const tags = await Tag.find();
+    const tag = await Tag.findOne({ where: { name: newTag.name } });
+
+    expect(successResponse1).toHaveHTTPStatus(200);
+    expect(successResponse2).toHaveHTTPStatus(200);
+    expect(successResponse3).toHaveHTTPStatus(200);
+    expect(tags.length).toBe(1);
+    expect(tag.name).toEqual(newTag.name);
+  });
+
   it('Should get page "/tasks/settings"', async () => {
     const res = await request.agent(server.server)
       .get('/tasks/settings')
