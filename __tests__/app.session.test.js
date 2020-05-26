@@ -336,6 +336,32 @@ describe('Testing session for registered user', () => {
     expect(res.text.toString()).toEqual(logoutPagehtml.toString());
   });
 
+  it('Should delete current user', async () => {
+    await request.agent(server.server)
+      .post('/users')
+      .set('Content-Type', 'application/json')
+      .send({ user: currUser })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const currUserFromDb = await User.findOne({ where: { email: currUser.email } });
+    const isCurrUserExistsBeforeDelQuery = currUserFromDb ? true : false;
+
+    await request.agent(server.server)
+      .delete('/users/user')
+      .set('cookie', await getCookie(server, currUser))
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const currUserFromDbAfterQuery = await User.findOne({ where: { email: currUser.email } })
+    const isCurrUserExistsAfterQuery = currUserFromDbAfterQuery ? true : false;
+
+    expect(isCurrUserExistsBeforeDelQuery).toBe(true);
+    expect(isCurrUserExistsAfterQuery).toBe(false);
+  });
+
   afterAll(async () => {
     await server.close();
     await fs.unlink(path.join(__dirname, 'database.sqlite'));
