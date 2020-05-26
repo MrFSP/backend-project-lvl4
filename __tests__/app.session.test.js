@@ -28,6 +28,12 @@ const changedUser = {
 const newTag = { name: 'Main' };
 const newTaskStatus = { name: 'tests' };
 
+const newTask = {
+  name: faker.lorem.word(),
+  status: newTaskStatus.name,
+  description: faker.lorem.text(),
+};
+
 const getCookie = async (server, user) => {
   const res = await request.agent(server.server)
     .post('/session')
@@ -206,6 +212,22 @@ describe('Testing session for registered user', () => {
     
     expect(res).toHaveHTTPStatus(200);
     expect(res.text.toString()).toEqual(settingsPagehtml.toString());
+  });
+
+  it('Should create new task', async () => {
+    await request.agent(server.server)
+      .post('/tasks/new')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ task: newTask, tagsForTask: newTag })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const taskFromDB = await Task.findOne({ where: { name: newTask.name } });
+
+    expect(taskFromDB.description).toEqual(newTask.description);
+    expect(taskFromDB.status).toEqual(newTask.status);
   });
 
   it('Should get page for changing password', async () => {
