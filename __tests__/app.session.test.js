@@ -298,6 +298,30 @@ describe('Testing session for registered user', () => {
     const userFromDb = await User.findOne({ where: { email: currUser.email } });
 
     expect(userFromDb.passwordDigest).toEqual(encrypt(changedUser.password));
+
+    currUser.password = changedUser.password;
+  });
+
+  it('user data should be changed', async () => {
+
+    await request.agent(server.server)
+      .post('/users/user')
+      .set('cookie', await getCookie(server, currUser))
+      .send({
+        user: {
+          email: changedUser.email,
+          firstName: changedUser.firstName,
+          lastName:changedUser.lastName,
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const userFromDb = await User.findOne({ where: { email: changedUser.email } });
+
+    expect(userFromDb.firstName).toEqual(changedUser.firstName);
+    expect(userFromDb.lastName).toEqual(changedUser.lastName);
   });
 
   it('Should delete current session', async () => {
