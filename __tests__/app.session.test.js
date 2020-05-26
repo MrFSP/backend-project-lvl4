@@ -29,9 +29,9 @@ const newTag = { name: 'Main' };
 const newTaskStatus = { name: 'tests' };
 
 const newTask = {
-  name: faker.lorem.word(),
+  name: 'quaerat',
   status: newTaskStatus.name,
-  description: faker.lorem.text(),
+  description: 'Libero deleniti eum recusandae repudiandae cupiditate aut. Tenetur ea vel. Ad asperiores sequi ut ex qui aut rem aspernatur.',
 };
 
 const getCookie = async (server, user) => {
@@ -52,6 +52,7 @@ let afterSignInPagehtml;
 let userPagehtml;
 let newTaskPagehtml;
 let changePassPagehtml;
+let changeTaskPagehtml;
 let cookie;
 
 describe('Testing session for registered user', () => {
@@ -64,6 +65,7 @@ describe('Testing session for registered user', () => {
     userPagehtml = await fs.readFile(path.join(pathToFixtures, 'user-page.html'));
     newTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'newtask-page.html'));
     changePassPagehtml = await fs.readFile(path.join(pathToFixtures, 'change-pass-page.html'));
+    changeTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'change-task-page.html'));
 
     expect.extend(matchers);
     server = app();
@@ -228,6 +230,19 @@ describe('Testing session for registered user', () => {
 
     expect(taskFromDB.description).toEqual(newTask.description);
     expect(taskFromDB.status).toEqual(newTask.status);
+  });
+
+  it('Should get page /tasks/change', async () => {
+    const res = await request.agent(server.server)
+      .post('/tasks/change')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ task: JSON.stringify(newTask) })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    expect(res.text.toString()).toEqual(changeTaskPagehtml.toString());
   });
 
   it('Should get page for changing password', async () => {
