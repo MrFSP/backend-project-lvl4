@@ -34,6 +34,12 @@ const newTask = {
   description: 'Libero deleniti eum recusandae repudiandae cupiditate aut. Tenetur ea vel. Ad asperiores sequi ut ex qui aut rem aspernatur.',
 };
 
+const changedNewTask = {
+  name: 'changedquaerat',
+  status: newTaskStatus.name,
+  description: 'Changed Libero deleniti eum recusandae repudiandae cupiditate aut. Tenetur ea vel. Ad asperiores sequi ut ex qui aut rem aspernatur.',
+};
+
 const getCookie = async (server, user) => {
   const res = await request.agent(server.server)
     .post('/session')
@@ -243,6 +249,23 @@ describe('Testing session for registered user', () => {
       });
 
     expect(res.text.toString()).toEqual(changeTaskPagehtml.toString());
+  });
+
+  it('Should change task', async () => {
+    const newTaskFromDB = await Task.findOne({ where: { name: newTask.name } });
+
+    await request.agent(server.server)
+      .post('/tasks/changecomplete')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ task: changedNewTask, oldTask: JSON.stringify(newTaskFromDB) })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const changedTaskFromDB = await Task.findOne({ where: { name: changedNewTask.name } });
+
+    expect(changedTaskFromDB.description).toEqual(changedNewTask.description);
+    expect(newTaskFromDB.id).toEqual(changedTaskFromDB.id);
   });
 
   it('Should get page for changing password', async () => {
