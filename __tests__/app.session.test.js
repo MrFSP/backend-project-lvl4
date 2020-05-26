@@ -160,6 +160,41 @@ describe('Testing session for registered user', () => {
     expect(tag.name).toEqual(newTag.name);
   });
 
+  it('Should set new task status', async () => {
+    const successResponse1 = await request.agent(server.server)
+      .post('/tasks/settings/addtaskstatus')
+      .send({ newTaskStatus: newTaskStatus })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const successResponse2 = await request.agent(server.server)
+      .post('/tasks/settings/addtaskstatus')
+      .send({ newTaskStatus: newTaskStatus })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const successResponse3 = await request.agent(server.server)
+      .post('/tasks/settings/addtaskstatus')
+      .send({ newTaskStatus: { name: '' } })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const statuses = await TaskStatus.find();
+    const status = await TaskStatus.findOne({ where: { name: newTaskStatus.name } });
+
+    expect(successResponse1).toHaveHTTPStatus(200);
+    expect(successResponse2).toHaveHTTPStatus(200);
+    expect(successResponse3).toHaveHTTPStatus(200);
+    expect(statuses.length).toBe(1);
+    expect(status.name).toEqual(newTaskStatus.name);
+  });
+
   it('Should get page "/tasks/settings"', async () => {
     const res = await request.agent(server.server)
       .get('/tasks/settings')
