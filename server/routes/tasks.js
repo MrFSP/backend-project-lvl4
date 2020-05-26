@@ -100,6 +100,52 @@ export default (app) => {
          { users, tags, taskStatuses, task, taskStatus, tag },
         );
     })
+    .post('/tasks/change', { name: 'changeTask' }, async (req, reply) => {
+      let { task } = req.body;
+      const userId = req.session.get('userId');
+      const users = await app.orm.getRepository(User).find();
+      const tags = await app.orm.getRepository(Tag).find();
+      const taskStatuses = await app.orm.getRepository(TaskStatus).find();
+      // const taskStatus = new TaskStatus();
+      // const tag = new Tag();
+      console.log('test string');
+      task = JSON.parse(task)
+      console.log(task);
+      console.log(task["name"]);
+      return reply.render(
+        'tasks/change',
+         { users, tags, taskStatuses, task},
+        );
+    })
+    .post('/tasks/changecomplete', { name: 'changeComplete' }, async (req, reply) => {
+      const { task } = req.body;
+      console.log('tagsIDtagsID');
+      const oldTask = JSON.parse(req.body.oldTask);
+
+      if (!task.name) {
+        req.flash('info', i18next.t('Введите название задачи'));
+        return reply.redirect(app.reverse('newTask'));
+      }
+      const currentUserId = req.session.get('userId');
+
+      try {
+        await app.orm
+          .createQueryBuilder()
+          .update(Task)
+          .set({
+            name: task.name,
+            description: task.description || '',
+            status: task.status,
+            assignedTo: task.assignedTo || '',
+            creator: currentUserId,
+          })
+          .where("id = :id", { id: oldTask.id })
+          .execute();
+        return reply.redirect(app.reverse('tasks'));
+      } catch (err) {
+        console.log(err);
+      }
+    })
     .post('/tasks/new', { name: 'newTaskPost' }, async (req, reply) => {
       // console.log(req.body);
       const { task, tagsForTask } = req.body;

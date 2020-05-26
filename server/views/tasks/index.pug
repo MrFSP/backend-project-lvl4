@@ -33,19 +33,32 @@ block content
     each task in tasks
       div(id=`accordion${task.id}`)
         .card
-          .card-header.row.ml-0.mr-0.pt-1.pb-1.justify-content-between(id=`heading${task.id}`)
-            .row.ml-0.mr-0
-              .mb-0
-                .btn.btn-link.collapsed(data-toggle='collapse' data-target=`#collapse${task.id}` aria-expanded='false' aria-controls=`collapse${task.id}`)= t(task.name)
-              span.d-flex.align-items-center
-                .badge.badge-primary.ml-1.mr-1() !{task.status}
+          .card-header.row.ml-0.mr-0.pt-0.pb-1.justify-content-between(id=`heading${task.id}`)
+            .col.ml-0.mr-0
+              .row
+                .mb-0
+                  .btn.btn-link.collapsed(data-toggle='collapse' data-target=`#collapse${task.id}` aria-expanded='false' aria-controls=`collapse${task.id}`)= t(task.name)
+                span.d-flex.align-items-center
+                  .badge.badge-primary.ml-1.mr-1() !{task.status}
               .d-flex.align-items-center
-                h6.ml-2.mb-0 Кому: !{users[task.assignedTo].fullName}
+                h6.ml-0.mb-1 Кому: !{users[task.assignedTo].fullName}
             .row.ml-0.mr-0
-              span.d-flex.align-items-center
-                each tag in task.tags
-                  .badge.badge-pill.badge-success.ml-1.mr-1 !{tag.name}
-              button.nav-link.btn.btn-sm.btn-link.text-danger(type='submit' form=`formForTask${task.id}`)= t('Удалить')
+              span.d-flex.align-items-top.mt-1
+                .col
+                  each tag in task.tags
+                    .badge.badge-pill.badge-success.ml-1.mr-1 !{tag.name}
+              .col
+                button.nav-link.btn.btn-sm.btn-link.text-primary.mr-0.pt-1.pb-1(
+                                                            type='submit'
+                                                            form=`formForTaskChange${task.id}`
+                                                            )= t('Изменить')
+                form(action=route('changeTask'), method='post' id=`formForTaskChange${task.id}`)
+                  input(name='task' value=task type='hidden')
+                button.nav-link.btn.btn-sm.btn-link.text-danger.pt-1.pb-1(
+                                                            type='submit'
+                                                            form=`formForTask${task.id}`
+                                                            onclick="return confirm('Вы уверены что хотите удалить задачу?')"
+                                                            )= t('Удалить')
                 form(action=route('deleteTask'), method='post' id=`formForTask${task.id}`)
                   input(name='taskID' value=`${task.id}` type='hidden')
           .collapse(aria-labelledby=`heading${task.id}` data-parent=`#accordion${task.id}` id=`collapse${task.id}`)
