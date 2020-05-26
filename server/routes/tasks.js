@@ -1,15 +1,10 @@
 // @ts-check
 
 import i18next from 'i18next';
-import { validate } from 'class-validator';
-import _ from 'lodash';
-import encrypt from '../lib/secure.js';
 import User from '../entity/User.js';
 import Task from '../entity/Task.js';
 import TaskStatus from '../entity/TaskStatus.js';
 import Tag from '../entity/Tag.js';
-import { access } from 'fs';
-// import { buildFromObj, buildFromModel } from '../lib/formObjectBuilder';
 
 const getUsers = async (app) => {
   const usersFromDB = await app.orm
@@ -36,8 +31,6 @@ const filterTasks = (tasks, filter) => {
   if (filter.taskStatus) {
     tasks = tasks.filter((task) => task.status === filter.taskStatus);
   }
-  console.log('tagstags');
-  console.log(tasks[0].tags);
   if (filter.tag) {
     tasks = tasks.filter((task) => {
       const taskTags = task.tags;
@@ -65,7 +58,6 @@ export default (app) => {
     })
     .post('/tasks/index', { name: 'filterTasks' }, async (req, reply) => {
       const { filter } = req.body;
-      console.log('filter');
       console.log(filter);
       const allTasks = await app.orm
         .getRepository(Task)
@@ -73,8 +65,6 @@ export default (app) => {
         .leftJoinAndSelect("task.tags", "tag")
         .getMany();
 
-      console.log(allTasks);
-      
       const tasks = filterTasks(allTasks, filter);
 
       const users = await getUsers(app);
@@ -85,15 +75,12 @@ export default (app) => {
       return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
-      const userId = req.session.get('userId');
-      console.log(userId);
       const users = await app.orm.getRepository(User).find();
       const tags = await app.orm.getRepository(Tag).find();
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
       const task = new Task();
       const taskStatus = new TaskStatus();
       const tag = new Tag();
-      console.log(task);
 
       return reply.render(
         'tasks/new',
@@ -106,12 +93,7 @@ export default (app) => {
       const users = await app.orm.getRepository(User).find();
       const tags = await app.orm.getRepository(Tag).find();
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
-      // const taskStatus = new TaskStatus();
-      // const tag = new Tag();
-      console.log('test string');
       task = JSON.parse(task)
-      console.log(task);
-      console.log(task["name"]);
       return reply.render(
         'tasks/change',
          { users, tags, taskStatuses, task},
@@ -119,7 +101,7 @@ export default (app) => {
     })
     .post('/tasks/changecomplete', { name: 'changeComplete' }, async (req, reply) => {
       const { task } = req.body;
-      console.log('tagsIDtagsID');
+
       const oldTask = JSON.parse(req.body.oldTask);
 
       if (!task.name) {
@@ -147,7 +129,6 @@ export default (app) => {
       }
     })
     .post('/tasks/new', { name: 'newTaskPost' }, async (req, reply) => {
-      // console.log(req.body);
       const { task, tagsForTask } = req.body;
       if (!task.name) {
         req.flash('info', i18next.t('Введите название задачи'));
@@ -176,9 +157,6 @@ export default (app) => {
       newTask.description = task.description || '';
       newTask.assignedTo = task.assignedTo || '';
       newTask.creator = currentUserId;
-
-      console.log('newTask');
-      console.log(newTask);
 
       try {
         newTask.tags = tagsNames ? await Promise.all(tags) : null;
@@ -240,8 +218,6 @@ export default (app) => {
       return reply.redirect(app.reverse('settings'));
     })
     .post('/tasks/deleteTask', { name: 'deleteTask'}, async (req, reply) => {
-      console.log('bodybody');
-      console.log(req.body);
       const taskID = req.body.taskID;
       await app.orm
         .createQueryBuilder()
