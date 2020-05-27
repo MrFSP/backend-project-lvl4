@@ -58,8 +58,6 @@ export default (app) => {
     })
     .post('/tasks/index', { name: 'filterTasks' }, async (req, reply) => {
       const { filter } = req.body;
-      console.log('filterfilter');
-      console.log(filter);
       const allTasks = await app.orm
         .getRepository(Task)
         .createQueryBuilder("task")
