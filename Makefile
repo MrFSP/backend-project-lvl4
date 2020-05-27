@@ -34,7 +34,7 @@ ts:
 	npm run test -- --verbose --silent --noStackTrace --debug false
 
 tc:
-	npm test -- --verbose --silent --coverage
+	npm test -- --coverage --verbose --silent --noStackTrace --debug false
 
 lint:
 	npx eslint .

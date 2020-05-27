@@ -58,6 +58,7 @@ export default (app) => {
     })
     .post('/tasks/index', { name: 'filterTasks' }, async (req, reply) => {
       const { filter } = req.body;
+      console.log('filterfilter');
       console.log(filter);
       const allTasks = await app.orm
         .getRepository(Task)
@@ -89,7 +90,7 @@ export default (app) => {
     })
     .post('/tasks/change', { name: 'changeTask' }, async (req, reply) => {
       let { task } = req.body;
-      const userId = req.session.get('userId');
+      // const userId = req.session.get('userId');
       const users = await app.orm.getRepository(User).find();
       const tags = await app.orm.getRepository(Tag).find();
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
