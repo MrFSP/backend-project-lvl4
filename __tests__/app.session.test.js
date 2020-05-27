@@ -40,6 +40,7 @@ const anotherNewTask = {
   status: anotherTaskStatus.name,
   description: `another ${newTask.description}`,
   assignedTo: 1,
+  creator: 1,
 };
 
 const changedNewTask = {
@@ -87,9 +88,9 @@ describe('Testing session for registered user', () => {
     await server.ready();
   });
 
-  // beforeEach(async () => {
-
-  // });
+  beforeEach(async () => {
+    await server.ready();
+  });
 
   // afterEach(async () => {
 
@@ -374,6 +375,39 @@ describe('Testing session for registered user', () => {
     expect(res.text.toString()).toEqual(logoutPagehtml.toString());
   });
 
+  it('Should delete task', async () => {
+    const taskForDeleting = {
+      name: `taskForDeleting${newTask.name}`,
+      status: `taskForDeleting${newTask.status}`,
+      description: `taskForDeleting${newTask.description}`,
+    }
+
+    await request.agent(server.server)
+    .post('/tasks/new')
+    .set('cookie', await getCookie(server, changedUser))
+    .send({ task: taskForDeleting })
+    .catch((err) => {
+      console.log(err);
+    });
+
+    const taskForDeletingFromDb = await Task.findOne({ where: { name: taskForDeleting.name } });
+    const isTaskForDeletingExistsBeforeDelQuery = taskForDeletingFromDb ? true : false;
+
+    await request.agent(server.server)
+      .post('/tasks/deleteTask')
+      .set('cookie', await getCookie(server, changedUser))
+      .send({ taskID: taskForDeletingFromDb.id })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const taskForDeletingFromDbAfterQuery = await Task.findOne({ where: { name: taskForDeleting.name } })
+    const isTaskForDeletingExistsAfterQuery = taskForDeletingFromDbAfterQuery ? true : false;
+
+    expect(isTaskForDeletingExistsBeforeDelQuery).toBe(true);
+    expect(isTaskForDeletingExistsAfterQuery).toBe(false);
+  });
+
   it('Should delete current user', async () => {
     await request.agent(server.server)
       .post('/users')
@@ -405,4 +439,4 @@ describe('Testing session for registered user', () => {
     await fs.unlink(path.join(__dirname, 'database.sqlite'));
   });
 
-});
+}, 20000);
