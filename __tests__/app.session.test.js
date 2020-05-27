@@ -2,7 +2,7 @@ import request from 'supertest';
 import matchers from 'jest-supertest-matchers';
 import { promises as fs } from 'fs';
 import path from 'path';
-import faker from 'faker';
+// import faker from 'faker';
 import User from '../server/entity/User';
 import Task from '../server/entity/Task';
 import TaskStatus from '../server/entity/TaskStatus';
@@ -27,11 +27,19 @@ const changedUser = {
 
 const newTag = { name: 'Main' };
 const newTaskStatus = { name: 'tests' };
+const anotherTaskStatus = {name: 'filtered status'};
 
 const newTask = {
   name: 'quaerat',
   status: newTaskStatus.name,
   description: 'Libero deleniti eum recusandae repudiandae cupiditate aut. Tenetur ea vel. Ad asperiores sequi ut ex qui aut rem aspernatur.',
+};
+
+const anotherNewTask = {
+  name: `another ${newTask.name}`,
+  status: anotherTaskStatus.name,
+  description: `another ${newTask.description}`,
+  assignedTo: 1,
 };
 
 const changedNewTask = {
@@ -59,7 +67,7 @@ let userPagehtml;
 let newTaskPagehtml;
 let changePassPagehtml;
 let changeTaskPagehtml;
-let cookie;
+let filteredTaskPagehtml;
 
 describe('Testing session for registered user', () => {
   let server;
@@ -72,15 +80,16 @@ describe('Testing session for registered user', () => {
     newTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'newtask-page.html'));
     changePassPagehtml = await fs.readFile(path.join(pathToFixtures, 'change-pass-page.html'));
     changeTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'change-task-page.html'));
+    filteredTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'filtered-task-page.html'));
 
     expect.extend(matchers);
     server = app();
     await server.ready();
   });
 
-  beforeEach(async () => {
-    // await server.ready();
-  });
+  // beforeEach(async () => {
+
+  // });
 
   // afterEach(async () => {
 
@@ -267,6 +276,35 @@ describe('Testing session for registered user', () => {
     expect(changedTaskFromDB.description).toEqual(changedNewTask.description);
     expect(newTaskFromDB.id).toEqual(changedTaskFromDB.id);
   });
+
+  it('Should get filtered task', async () => {
+    await request.agent(server.server)
+      .post('/tasks/settings/addtaskstatus')
+      .send({ newTaskStatus: anotherTaskStatus })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await request.agent(server.server)
+      .post('/tasks/new')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ task: anotherNewTask })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const res = await request.agent(server.server)
+      .post('/tasks/index')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ filter: { taskStatus: 'filtered status' } })
+      .redirects(1)
+      .catch((err) => {
+        console.log(err);
+      });
+
+    expect(res.text.toString()).toEqual(filteredTaskPagehtml.toString());
+  });
+
 
   it('Should get page for changing password', async () => {
     const res = await request.agent(server.server)
