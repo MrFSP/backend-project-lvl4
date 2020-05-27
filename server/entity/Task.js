@@ -26,7 +26,7 @@ class Task extends BaseEntity {
   assignedTo = '';
 
   @ManyToMany(
-    type => Tag,
+    () => Tag,
     tag => tag.tasks,
     { eager: true }
   )

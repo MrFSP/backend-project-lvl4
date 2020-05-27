@@ -13,19 +13,12 @@ start-backend:
 start-frontend:
 	npx webpack-dev-server
 
-heroku-start:
-	npm install
-	npm run build-configs
-	npm run build-server
-	npm run start
-
 hsp:
 	npm run-script start
 
 hsl:
 	npm run build
 	npm run-script start
-
 
 t:
 	npm run test -- --verbose

@@ -15,7 +15,7 @@ class Tag extends BaseEntity {
   @IsNotEmpty()
   name = '';
 
-  @ManyToMany(type => Task, task => task.tags)
+  @ManyToMany(() => Task, task => task.tags)
   tasks = Promise;
 }
 
