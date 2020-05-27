@@ -24,8 +24,6 @@ block content
               option.form-control(selected='' disabled='' value='') Тег
               each tag in tags
                 option.form-control(value=tag.id)= t(`${tag.name}`)
-          //- .form-group
-          //-   input.form-control(type='hidden' value=tasks)
         .row.justify-content-end
           button.btn.btn-outline-primary.mb-1.mr-3(
               form='filterForm',
@@ -66,12 +64,3 @@ block content
             .card-body.pb-1
               .d-flex.justify-content-end
                 h6 Автор: !{users[task.creator].fullName}
-                
-    //- #accordion
-    //-   .card
-    //-     #headingOne.card-header
-    //-       h5.mb-0
-    //-         button.btn.btn-link.collapsed(data-toggle='collapse' data-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne') Контрольный шаблон
-    //-     #collapseOne.collapse(aria-labelledby='headingOne' data-parent='#accordion')
-    //-       .card-body
-    //-         | Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven&apos;t heard of them accusamus labore sustainable VHS.
