@@ -191,7 +191,7 @@ export default (app) => {
       const trySaveProp = async (value, type) => {
         const prop = type === 'tag' ? Tag : TaskStatus;
       
-        const isExists = await app.orm
+      const isExists = await app.orm
         .getRepository(prop)
         .findOne({ name: value.name })
         ? true

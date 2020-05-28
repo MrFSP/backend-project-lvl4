@@ -4,7 +4,7 @@ block content
   .container.col-4.justify-content-center
     .d-flex.flex-column
       h3.mb-3.font-weight-normal.text-center Данные пользователя
-      +formToChangeUserData()(action=route('userUpdate') method='post')
+      +formToChangeUserData()(action=route('user') method='post')
         each key in keys
           +inputToChangeUserData(user, key)(type='!{key}')
         .d-flex.flex-column.pt-3.pb-3
