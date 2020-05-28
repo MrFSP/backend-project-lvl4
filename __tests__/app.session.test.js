@@ -151,7 +151,7 @@ describe('Testing session for registered user', () => {
 
   it('Should set new tag', async () => {
     const successResponse1 = await request.agent(server.server)
-      .post('/tasks/settings/addtag')
+      .post('/tasks/settings')
       .send({ newTag: newTag })
       .redirects(1)
       .catch((err) => {
@@ -159,7 +159,7 @@ describe('Testing session for registered user', () => {
       });
 
     const successResponse2 = await request.agent(server.server)
-      .post('/tasks/settings/addtag')
+      .post('/tasks/settings')
       .send({ newTag: newTag })
       .redirects(1)
       .catch((err) => {
@@ -167,7 +167,7 @@ describe('Testing session for registered user', () => {
       });
 
     const successResponse3 = await request.agent(server.server)
-      .post('/tasks/settings/addtag')
+      .post('/tasks/settings')
       .send({ newTag: { name: '' } })
       .redirects(1)
       .catch((err) => {
@@ -186,7 +186,7 @@ describe('Testing session for registered user', () => {
 
   it('Should set new task status', async () => {
     const successResponse1 = await request.agent(server.server)
-      .post('/tasks/settings/addtaskstatus')
+      .post('/tasks/settings')
       .send({ newTaskStatus: newTaskStatus })
       .redirects(1)
       .catch((err) => {
@@ -194,7 +194,7 @@ describe('Testing session for registered user', () => {
       });
 
     const successResponse2 = await request.agent(server.server)
-      .post('/tasks/settings/addtaskstatus')
+      .post('/tasks/settings')
       .send({ newTaskStatus: newTaskStatus })
       .redirects(1)
       .catch((err) => {
@@ -202,7 +202,7 @@ describe('Testing session for registered user', () => {
       });
 
     const successResponse3 = await request.agent(server.server)
-      .post('/tasks/settings/addtaskstatus')
+      .post('/tasks/settings')
       .send({ newTaskStatus: { name: '' } })
       .redirects(1)
       .catch((err) => {
@@ -249,10 +249,12 @@ describe('Testing session for registered user', () => {
   });
 
   it('Should get page /tasks/change', async () => {
+    const task = await Task.findOne({ where: { name: newTask.name } });
+
     const res = await request.agent(server.server)
-      .post('/tasks/change')
+      .get(`/tasks/change?taskId=${task.id}`)
       .set('cookie', await getCookie(server, currUser))
-      .send({ task: JSON.stringify(newTask) })
+      // .send({ task: JSON.stringify(newTask) })
       .redirects(1)
       .catch((err) => {
         console.log(err);
@@ -265,7 +267,7 @@ describe('Testing session for registered user', () => {
     const newTaskFromDB = await Task.findOne({ where: { name: newTask.name } });
 
     await request.agent(server.server)
-      .post('/tasks/changecomplete')
+      .post('/tasks/change')
       .set('cookie', await getCookie(server, currUser))
       .send({ task: changedNewTask, oldTask: JSON.stringify(newTaskFromDB) })
       .catch((err) => {
@@ -280,7 +282,7 @@ describe('Testing session for registered user', () => {
 
   it('Should get filtered task', async () => {
     await request.agent(server.server)
-      .post('/tasks/settings/addtaskstatus')
+      .post('/tasks/settings')
       .send({ newTaskStatus: anotherTaskStatus })
       .catch((err) => {
         console.log(err);
@@ -295,7 +297,7 @@ describe('Testing session for registered user', () => {
       });
 
     const res = await request.agent(server.server)
-      .post('/tasks/index')
+      .post('/tasks')
       .set('cookie', await getCookie(server, currUser))
       .send({ filter: { taskStatus: 'filtered status' } })
       .redirects(1)
@@ -394,7 +396,7 @@ describe('Testing session for registered user', () => {
     const isTaskForDeletingExistsBeforeDelQuery = taskForDeletingFromDb ? true : false;
 
     await request.agent(server.server)
-      .post('/tasks/deleteTask')
+      .delete('/tasks')
       .set('cookie', await getCookie(server, changedUser))
       .send({ taskID: taskForDeletingFromDb.id })
       .catch((err) => {

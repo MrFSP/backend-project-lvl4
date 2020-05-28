@@ -42,7 +42,7 @@ const filterTasks = (tasks, filter) => {
 
 export default (app) => {
   app
-    .get('/tasks/index', { name: 'tasks' }, async (req, reply) => {
+    .get('/tasks', { name: 'tasks' }, async (req, reply) => {
       const tasks = await app.orm
         .getRepository(Task)
         .createQueryBuilder("task")
@@ -56,7 +56,7 @@ export default (app) => {
 
       return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })
-    .post('/tasks/index', { name: 'filterTasks' }, async (req, reply) => {
+    .post('/tasks', async (req, reply) => {
       const { filter } = req.body;
       const allTasks = await app.orm
         .getRepository(Task)
@@ -73,6 +73,16 @@ export default (app) => {
 
       return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })
+    .delete('/tasks', async (req, reply) => {
+      const { taskID } = req.body;
+      await app.orm
+        .createQueryBuilder()
+        .delete()
+        .from(Task)
+        .where("id = :id", { id: taskID })
+        .execute();
+      return reply.redirect(app.reverse('tasks'));
+    })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
       const users = await app.orm.getRepository(User).find();
       const tags = await app.orm.getRepository(Tag).find();
@@ -86,48 +96,7 @@ export default (app) => {
          { users, tags, taskStatuses, task, taskStatus, tag },
         );
     })
-    .post('/tasks/change', { name: 'changeTask' }, async (req, reply) => {
-      let { task } = req.body;
-      // const userId = req.session.get('userId');
-      const users = await app.orm.getRepository(User).find();
-      const tags = await app.orm.getRepository(Tag).find();
-      const taskStatuses = await app.orm.getRepository(TaskStatus).find();
-      task = JSON.parse(task)
-      return reply.render(
-        'tasks/change',
-         { users, tags, taskStatuses, task},
-        );
-    })
-    .post('/tasks/changecomplete', { name: 'changeComplete' }, async (req, reply) => {
-      const { task } = req.body;
-
-      const oldTask = JSON.parse(req.body.oldTask);
-
-      if (!task.name) {
-        req.flash('info', i18next.t('Введите название задачи'));
-        return reply.redirect(app.reverse('newTask'));
-      }
-      const currentUserId = req.session.get('userId');
-
-      try {
-        await app.orm
-          .createQueryBuilder()
-          .update(Task)
-          .set({
-            name: task.name,
-            description: task.description || '',
-            status: task.status,
-            assignedTo: task.assignedTo || '',
-            creator: currentUserId,
-          })
-          .where("id = :id", { id: oldTask.id })
-          .execute();
-        return reply.redirect(app.reverse('tasks'));
-      } catch (err) {
-        console.log(err);
-      }
-    })
-    .post('/tasks/new', { name: 'newTaskPost' }, async (req, reply) => {
+    .post('/tasks/new', async (req, reply) => {
       const { task, tagsForTask } = req.body;
       if (!task.name) {
         req.flash('info', i18next.t('Введите название задачи'));
@@ -166,6 +135,46 @@ export default (app) => {
       }
 
     })
+    .get('/tasks/change', { name: 'changeTask' }, async (req, reply) => {
+      const { taskId } = req.query;
+      const users = await app.orm.getRepository(User).find();
+      const tags = await app.orm.getRepository(Tag).find();
+      const taskStatuses = await app.orm.getRepository(TaskStatus).find();
+      const task = await app.orm.getRepository(Task).findOne({ id: taskId })
+      return reply.render(
+        'tasks/change',
+         { users, tags, taskStatuses, task},
+        );
+    })
+    .post('/tasks/change', async (req, reply) => {
+      const { task } = req.body;
+
+      const oldTask = JSON.parse(req.body.oldTask);
+
+      if (!task.name) {
+        req.flash('info', i18next.t('Введите название задачи'));
+        return reply.redirect(app.reverse('newTask'));
+      }
+      const currentUserId = req.session.get('userId');
+
+      try {
+        await app.orm
+          .createQueryBuilder()
+          .update(Task)
+          .set({
+            name: task.name,
+            description: task.description || '',
+            status: task.status,
+            assignedTo: task.assignedTo || '',
+            creator: currentUserId,
+          })
+          .where("id = :id", { id: oldTask.id })
+          .execute();
+        return reply.redirect(app.reverse('tasks'));
+      } catch (err) {
+        console.log(err);
+      }
+    })
     .get('/tasks/settings', { name: 'settings' }, async (req, reply) => {
       const tags = await app.orm.getRepository(Tag).find();
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
@@ -176,56 +185,33 @@ export default (app) => {
           { tags, taskStatuses, newTaskStatus, newTag },
         );
     })
-    .post('/tasks/settings/addtag', { name: 'addTag' }, async (req, reply) => {
-      const { newTag } = req.body;
-      console.log('req.bodyreq.body');
-      console.log(req.body);
-      const isTagExists = await app.orm
-        .getRepository(Tag)
-        .findOne({ name: newTag.name })
+    .post('/tasks/settings', async (req, reply) => {
+      const { newTag, newTaskStatus } = req.body;
+
+      const trySaveProp = async (value, type) => {
+        const prop = type === 'tag' ? Tag : TaskStatus;
+      
+        const isExists = await app.orm
+        .getRepository(prop)
+        .findOne({ name: value.name })
         ? true
         : false;
+      
+        if (isExists) {
+          req.flash('error', i18next.t(`flash.tasks.${type}.exists`));
+        } else if (!value.name) {
+          req.flash('error', i18next.t(`flash.tasks.${type}.empty`));
+        } else if (!isExists) {
+          await prop.create(value).save();
+          req.flash('info', i18next.t(`flash.tasks.${type}.added`));
+        } else {
+          req.flash('error', i18next.t(`flash.tasks.error`));
+        }
+      };
 
-      if (isTagExists) {
-        req.flash('error', i18next.t('Тег с таким именем уже существует'));
-      } else if (!newTag.name) {
-        req.flash('error', i18next.t('Введите имя тега'));
-      } else if (!isTagExists) {
-        await Tag.create(newTag).save();
-        req.flash('info', i18next.t('Тег добавлен'));
-      } else {
-        req.flash('error', i18next.t('Непредвиденная ошибка'));
-      }
-      return reply.redirect(app.reverse('settings'));
-    })
-    .post('/tasks/settings/addtaskstatus', { name: 'addTaskStatus' }, async (req, reply) => {
-      const { newTaskStatus } = req.body;
-      const isTaskStatusExists = await app.orm
-        .getRepository(TaskStatus)
-        .findOne({ name: newTaskStatus.name })
-        ? true
-        : false;
+      newTag ? await trySaveProp(newTag, 'tag') : null;
+      newTaskStatus ? await trySaveProp(newTaskStatus, 'status') : null;
 
-      if (isTaskStatusExists) {
-        req.flash('error', i18next.t('Статус с таким именем уже существует'));
-      } else if (!newTaskStatus.name) {
-        req.flash('error', i18next.t('Введите имя статуса'));
-      } else if (!isTaskStatusExists) {
-        await TaskStatus.create(newTaskStatus).save();
-        req.flash('info', i18next.t('Статус добавлен'));
-      } else {
-        req.flash('error', i18next.t('Непредвиденная ошибка'));
-      }
       return reply.redirect(app.reverse('settings'));
-    })
-    .post('/tasks/deleteTask', { name: 'deleteTask'}, async (req, reply) => {
-      const taskID = req.body.taskID;
-      await app.orm
-        .createQueryBuilder()
-        .delete()
-        .from(Task)
-        .where("id = :id", { id: taskID })
-        .execute();
-      return reply.redirect(app.reverse('tasks'));
     });
 };

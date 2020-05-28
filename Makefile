@@ -21,13 +21,13 @@ hsl:
 	npm run-script start
 
 t:
-	npm run test -- --verbose
+	npm run test -- --verbose --runInBand
 
 ts:
 	npm run test -- --verbose --silent --noStackTrace --debug false
 
 tc:
-	npm test -- --coverage --verbose --silent --noStackTrace --debug false
+	npm test -- --runInBand --coverage --verbose --silent --noStackTrace --debug false
 
 lint:
 	npx eslint .

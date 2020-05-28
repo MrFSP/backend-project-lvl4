@@ -10,7 +10,7 @@ mixin list(items)
 block content
   .container.col-md-4.justify-content-center
     h3.mb-3.font-weight-normal.text-center Настройки
-    form#tagSettings(action=route('addTag') method='post')
+    form#tagSettings(action=route('settings') method='post')
       .text-center
         h5 Теги
         +list(tags)
@@ -22,7 +22,7 @@ block content
                 form='tagSettings'
               ) Добавить
     hr
-    form#taskStatus(action=route('addTaskStatus') method='post')
+    form#taskStatus(action=route('settings') method='post')
       .form-group
         .text-center
           h5 Статусы

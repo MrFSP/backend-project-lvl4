@@ -4,33 +4,69 @@ block content
   .container.col-10.justify-content-center
     h3.mb-3.font-weight-normal.text-center Список задач
     .row.justify-content-between
-      a.nav-link(href=route('newTask')) Создать задачу
-      button.btn.btn-link.mr-5.pr-3(type='submit' form='myTask') Мои задачи
-        form(action=route('filterTasks') method='post' id='myTask')
+      a.nav-link(
+        href=route('newTask')
+      ) Создать задачу
+      button.btn.btn-link.mr-5.pr-3(
+        type='submit'
+        form='myTask'
+      ) Мои задачи
+        form(
+          action=route('tasks')
+          method='post'
+          id='myTask'
+        )
           input(
-                name='filter[assignedTo]'
-                value=reply.request.session.get('userId')
-                type='hidden'
-                )
-      .btn.btn-link.collapsed(data-toggle='collapse' data-target='#collapseForm' aria-expanded='false' aria-controls='collapseForm') Фильтры
+            name='filter[assignedTo]'
+            value=reply.request.session.get('userId')
+            type='hidden'
+          )
+      .btn.btn-link.collapsed(
+        data-toggle='collapse'
+        data-target='#collapseForm'
+        aria-expanded='false'
+        aria-controls='collapseForm'
+      ) Фильтры
     #collapseForm.collapse.pb-2
       .col
-        form.row(action=route('filterTasks') method='post' id='filterForm')
+        form.row(
+          action=route('tasks')
+          method='post'
+          id='filterForm'
+        )
           .form-group.col-md-4.mb-2
             select.form-control(name='filter[assignedTo]')
-              option.form-control(selected='' disabled='' value='') Кому
+              option.form-control(
+                selected=''
+                disabled=''
+                value=''
+              ) Кому
               each user in Object.values(users)
-                option.form-control(value=user.id)= t(`${user.fullName}`)
+                option.form-control(
+                  value=user.id
+                )= t(`${user.fullName}`)
           .form-group.col-md-4.mb-2
             select.form-control(name='filter[taskStatus]')
-              option.form-control(selected='' disabled='' value='') Статус
+              option.form-control(
+                selected=''
+                disabled=''
+                value=''
+              ) Статус
               each taskStatus in taskStatuses
-                option.form-control(value=taskStatus.name)= t(`${taskStatus.name}`)
+                option.form-control(
+                  value=taskStatus.name
+                )= t(`${taskStatus.name}`)
           .form-group.col-md-4.mb-2
             select.form-control(name='filter[tag]')
-              option.form-control(selected='' disabled='' value='') Тег
+              option.form-control(
+                selected=''
+                disabled=''
+                value=''
+              ) Тег
               each tag in tags
-                option.form-control(value=tag.id)= t(`${tag.name}`)
+                option.form-control(
+                  value=tag.id
+                )= t(`${tag.name}`)
         .row.justify-content-end
           button.btn.btn-outline-primary.mb-1.mr-3(
               form='filterForm',
@@ -38,35 +74,67 @@ block content
     each task in tasks
       div(id=`accordion${task.id}`)
         .card
-          .card-header.row.ml-0.mr-0.pt-0.pb-1.justify-content-between(id=`heading${task.id}`)
+          .card-header.row.ml-0.mr-0.pt-0.pb-1.justify-content-between(
+            id=`heading${task.id}`
+          )
             .col.ml-0.mr-0
               .row
                 .mb-0
-                  .btn.btn-link.collapsed(data-toggle='collapse' data-target=`#collapse${task.id}` aria-expanded='false' aria-controls=`collapse${task.id}`)= t(task.name)
+                  .btn.btn-link.collapsed(
+                    data-toggle='collapse'
+                    data-target=`#collapse${task.id}`
+                    aria-expanded='false'
+                    aria-controls=`collapse${task.id}`
+                  )= t(task.name)
                 span.d-flex.align-items-center
                   .badge.badge-primary.ml-1.mr-1() !{task.status}
               .d-flex.align-items-center
-                h6.ml-0.mb-1 Кому: !{users[task.assignedTo].fullName}
+                h6.ml-0.mb-1 Кому: !{task.assignedTo ? users[task.assignedTo].fullName : ''}
             .row.ml-0.mr-0
               span.d-flex.align-items-top.mt-1
                 .col
                   each tag in task.tags
                     .badge.badge-pill.badge-success.ml-1.mr-1 !{tag.name}
               .col
-                button.nav-link.btn.btn-sm.btn-link.text-primary.mr-0.pt-1.pb-1(
-                                                            type='submit'
-                                                            form=`formForTaskChange${task.id}`
-                                                            )= t('Изменить')
-                form(action=route('changeTask'), method='post' id=`formForTaskChange${task.id}`)
-                  input(name='task' value=task type='hidden')
-                button.nav-link.btn.btn-sm.btn-link.text-danger.pt-1.pb-1(
-                                                            type='submit'
-                                                            form=`formForTask${task.id}`
-                                                            onclick="return confirm('Вы уверены что хотите удалить задачу?')"
-                                                            )= t('Удалить')
-                form(action=route('deleteTask'), method='post' id=`formForTask${task.id}`)
-                  input(name='taskID' value=`${task.id}` type='hidden')
-          .collapse(aria-labelledby=`heading${task.id}` data-parent=`#accordion${task.id}` id=`collapse${task.id}`)
+                button.btn.btn-link.btn-sm.text-primary.mt-1(
+                  type='submit'
+                  form=`formForTaskChange${task.id}`
+                )= t('Изменить')
+                form(
+                  action=route('changeTask')
+                  method='get'
+                  id=`formForTaskChange${task.id}`
+                )
+                  input(
+                    name='taskId'
+                    value=task.id
+                    type='hidden'
+                  )
+                button.btn.btn-link.btn-sm.text-danger(
+                  type='submit'
+                  form=`formForDeleteTask${task.id}`
+                  onclick="return confirm('Вы уверены что хотите удалить задачу?')"
+                )= t('Удалить')
+                form(
+                  action=route('tasks')
+                  method='post'
+                  id=`formForDeleteTask${task.id}`
+                )
+                  input(
+                    name='taskID'
+                    value=task.id
+                    type='hidden'
+                  )
+                  input(
+                    name="_method"
+                    type="hidden"
+                    value='delete'
+                  )
+          .collapse(
+            aria-labelledby=`heading${task.id}`
+            data-parent=`#accordion${task.id}`
+            id=`collapse${task.id}`
+          )
             .card-body.mt-0.pt-2.p.pb-0 !{task.description}
             .card-body.pb-1
               .d-flex.justify-content-end

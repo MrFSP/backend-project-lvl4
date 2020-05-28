@@ -3,7 +3,7 @@ extends ../layouts/application.pug
 block content
   .container.col-6.justify-content-center
     h3.mb-3.font-weight-normal.text-center Изменить задачу
-    form#task(action=route('changeComplete') method='post')
+    form#task(action=route('changeTask') method='post')
       input#FormControlInput1.form-control.data-bv-notempty-message(
                                               name='oldTask'
                                               value=task
