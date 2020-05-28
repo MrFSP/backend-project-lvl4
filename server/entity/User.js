@@ -6,7 +6,11 @@ class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id = null;
 
-  @Column('varchar')
+  @Column({
+    type: "varchar",
+    length: 150,
+    unique: true,
+  })
   @IsEmail()
   @IsNotEmpty()
   email = '';
