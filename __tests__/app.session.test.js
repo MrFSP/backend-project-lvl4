@@ -111,6 +111,19 @@ describe('Testing session for registered user', () => {
     expect(userFromDb.passwordDigest).toEqual(encrypt(currUser.password));
   });
 
+  it('Should deny registration with exists email', async () => {
+    await request.agent(server.server)
+      .post('/users')
+      .send({ user: currUser })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const usersFromDb = await User.find();
+
+    expect(usersFromDb.length).toEqual(1);
+  });
+
   it('Should get new session', async () => {
     const res = await request.agent(server.server)
       .post('/session')
@@ -323,7 +336,7 @@ describe('Testing session for registered user', () => {
 
   it('Should get changed password', async () => {
     await request.agent(server.server)
-      .post('/users/password/index')
+      .post('/users/password')
       .set('cookie', await getCookie(server, currUser))
       .send({
         object: {
@@ -441,4 +454,4 @@ describe('Testing session for registered user', () => {
     await fs.unlink(path.join(__dirname, 'database.sqlite'));
   });
 
-}, 20000);
+});
