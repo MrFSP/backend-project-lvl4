@@ -128,14 +128,9 @@ export default (app) => {
       newTask.assignedTo = task.assignedTo || '';
       newTask.creator = currentUserId;
 
-      try {
-        newTask.tags = tagsNames ? await Promise.all(tags) : null;
-        await Task.save(newTask);
-        return reply.redirect(app.reverse('tasks'));
-      } catch (err) {
-        console.log(err);
-      }
-
+      newTask.tags = tagsNames ? await Promise.all(tags) : null;
+      await Task.save(newTask);
+      return reply.redirect(app.reverse('tasks'));
     })
     .get('/tasks/change', { name: 'changeTask' }, async (req, reply) => {
       const { taskId } = req.query;

@@ -35,6 +35,12 @@ const newTask = {
   description: 'Libero deleniti eum recusandae repudiandae cupiditate aut. Tenetur ea vel. Ad asperiores sequi ut ex qui aut rem aspernatur.',
 };
 
+const newTaskWithEmptyName = {
+  name: '',
+  status: newTask.name,
+  description: newTask.description,
+};
+
 const anotherNewTask = {
   name: `another ${newTask.name}`,
   status: anotherTaskStatus.name,
@@ -164,10 +170,19 @@ describe('Testing session for registered user', () => {
         console.log(err);
       });
 
-      console.log('resres');
-      console.log(res);
     expect(res).toHaveHTTPStatus(200);
     // expect(res.text.toString()).toEqual(userPagehtml.toString());
+  });
+
+  it('User should be redirected to "/tasks"', async () => {
+    const res = await request.agent(server.server)
+      .get('/')
+      .set('cookie', await getCookie(server, currUser))
+      .catch((err) => {
+        console.log(err);
+      });
+
+    expect(res).toHaveHTTPStatus(302);
   });
 
   it('Should get page "/tasks"', async () => {
@@ -276,6 +291,7 @@ describe('Testing session for registered user', () => {
   });
 
   it('Should create new task', async () => {
+
     await request.agent(server.server)
       .post('/tasks/new')
       .set('cookie', await getCookie(server, currUser))
@@ -284,10 +300,20 @@ describe('Testing session for registered user', () => {
         console.log(err);
       });
 
+    await request.agent(server.server)
+      .post('/tasks/new')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ task: newTaskWithEmptyName, tagsForTask: newTag })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const tasks = await Task.find();
     const taskFromDB = await Task.findOne({ where: { name: newTask.name } });
 
     expect(taskFromDB.description).toEqual(newTask.description);
     expect(taskFromDB.status).toEqual(newTask.status);
+    expect(tasks.length).toBe(1);
   });
 
   it('Should get page /tasks/change', async () => {
@@ -315,10 +341,19 @@ describe('Testing session for registered user', () => {
         console.log(err);
       });
 
+    const res = await request.agent(server.server)
+      .post('/tasks/change')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ task: newTaskWithEmptyName, oldTask: JSON.stringify(newTaskFromDB) })
+      .catch((err) => {
+        console.log(err);
+      });
+
     const changedTaskFromDB = await Task.findOne({ where: { name: changedNewTask.name } });
 
     expect(changedTaskFromDB.description).toEqual(changedNewTask.description);
     expect(newTaskFromDB.id).toEqual(changedTaskFromDB.id);
+    expect(res).toHaveHTTPStatus(302);
   });
 
   it('Should get filtered task', async () => {
