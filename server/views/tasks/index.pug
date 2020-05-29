@@ -2,7 +2,11 @@ extends ../layouts/application.pug
 
 block content
   .container.col-10.justify-content-center
-    h3.mb-3.font-weight-normal.text-center= t('views.tasks.tasks.title')
+    .row.justify-content-center
+      a.btn.text-lg.mb-0(
+        href=route('tasks')
+      )
+        h4= t('views.tasks.tasks.title')
     .row.justify-content-between
       a.nav-link(
         href=route('newTask')

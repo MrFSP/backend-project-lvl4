@@ -41,4 +41,4 @@ hl:
 am:
 	git add .
 	git commit --amend
-	git push -f origin feature/step_3
+	git push -f origin develop

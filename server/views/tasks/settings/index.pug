@@ -22,16 +22,16 @@ block content
                 form='tagSettings'
               )= t('views.tasks.settings.add')
     hr
-    form#taskStatus(action=route('settings') method='post')
+    form#taskStatusSettings(action=route('settings') method='post')
+      .text-center
+        h5=t('views.tasks.settings.statuses')
+        +list(taskStatuses)
       .form-group
-        .text-center
-          h5=t('views.tasks.settings.statuses')
-          +list(taskStatuses)
         label(for='formControlInput')= t('views.tasks.settings.newTaskStatus')
         input#formControlInput.form-control(name='newTaskStatus[name]' autocomplete='off')
     .d-flex
       button.btn.btn-block.btn-outline-primary(
-                form='taskStatus'
+                form='taskStatusSettings'
               )= t('views.tasks.settings.add')
     hr
     .d-flex.mb-3
