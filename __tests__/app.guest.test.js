@@ -30,12 +30,6 @@ describe('Testing responses for Guest', () => {
     expect(res3).toHaveHTTPStatus(200);
   });
 
-  it('should return 404', async () => {
-    const res = await request.agent(server.server)
-      .get('/wrong-path');
-    expect(res).toHaveHTTPStatus(404);
-  });
-
   afterAll(async () => {
     await server.close();
   });
