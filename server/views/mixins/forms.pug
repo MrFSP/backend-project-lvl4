@@ -57,12 +57,6 @@ mixin submit(form = null)
 mixin submitUpdate(form = null)
   input.btn.btn-outline-primary(type='submit')&attributes(attributes)
 
-mixin checkbox
-  .checkbox.mb-3
-    label
-      input(type='checkbox' value='remember-me')
-      |  Remember me
-
 mixin buttonTo(action, method)
   form(action=action, method="post")
     input(name="_method" type="hidden" value=method)
@@ -123,18 +117,6 @@ mixin buttonDeleteUser()
                           class="btn btn-danger"
                           value=t('views.user.delete.confirmDelete')
                         )
-
-mixin userInfo(user, keys)
-  table.table.text-right
-    tbody
-      tr
-        td.h5 id
-        td.h5 !{user.id}
-        td
-      tr
-        td.h5 email
-        td.h5 !{user.email}
-        td
 
 mixin changeProp(route, properties, nameOfNewProp)
   form#settings(action=route(route) method='post')

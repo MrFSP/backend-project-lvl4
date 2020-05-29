@@ -2,15 +2,17 @@ extends ../layouts/application.pug
 
 block content
   .container.col-6.justify-content-center
-    h3.mb-3.font-weight-normal.text-center Новая задача
+    h3.mb-3.font-weight-normal.text-center= t('views.tasks.new.title')
     form#task(action=route('newTask') method='post')
       .form-group
-        label(for='FormControlInput1') Название задачи
+        label(for='FormControlInput1')= t('views.tasks.change.taskName')
         input#FormControlInput1.form-control.data-bv-notempty-message(
                                               name='task[name]'
                                               autocomplete='off'
                                               )
-      label(for='inlineFormCustomSelect') Статус
+      label(
+        for='inlineFormCustomSelect'
+      )= t('views.tasks.change.status')
       .form-group.d-flex.pb-2
         select#inlineFormCustomSelect.col-md-4.form-control(name='task[status]')
           each taskStatus in taskStatuses
@@ -33,14 +35,17 @@ block content
         textarea.form-control(
                   name='task[description]'
                   rows="6"
-                  placeholder='Введите описание задачи'
+                  placeholder= t('views.tasks.new.description')
                   )
       .form-group
         select#inlineFormCustomSelect.w-100.form-control(
                   name='task[assignedTo]'
                   required=''
                   )
-          option(selected='' disabled='') Ответственный
+          option(
+            selected=''
+            disabled=''
+          )= t('views.tasks.change.assignedto')
           each user in users
             option.form-control(
                     name='assignedTo[id]'
@@ -51,7 +56,7 @@ block content
       a.btn.btn-link(
                 href=route('tasks'),
                 method='get',
-              ) Вернуться к задачам
+              )= t('views.tasks.settings.back')
       button.btn.btn-link(
                 form='task'
-              ) Создать задачу
+              )= t('views.tasks.new.create')

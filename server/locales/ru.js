@@ -23,6 +23,11 @@ module.exports = {
         },
       },
       tasks: {
+        empty: 'Введите имя статуса или тега',
+        error: 'Непредвиденная ошибка',
+        info: {
+          empty: 'Введите название задачи',
+        },
         status: {
           exists: 'Статус с таким именем уже существует',
           empty: 'Введите имя статуса',
@@ -33,8 +38,6 @@ module.exports = {
           empty: 'Введите имя тега',
           added: 'Тег добавлен',
         },
-        empty: 'Введите имя статуса или тега',
-        error: 'Непредвиденная ошибка',
       }
     },
     layouts: {
@@ -44,13 +47,6 @@ module.exports = {
         signUp: 'Регистрация',
         signOut: 'Выход',
       },
-    },
-    tasks: {
-      settings: {
-        newTag: 'Добавить тег',
-        newTaskStatus: 'Добавить статус',
-        add: 'Добавить',
-      }
     },
     views: {
       session: {
@@ -63,6 +59,40 @@ module.exports = {
         new: {
           submit: 'Сохранить',
           signUp: 'Регистрация',
+        },
+      },
+      tasks: {
+        change: {
+          title: 'Изменить задачу',
+          taskName: 'Название задачи',
+          status: 'Статус',
+          assignedto: 'Ответственный',
+          save: 'Сохранить',
+        },
+        new: {
+          title: 'Новая задача',
+          description: 'Введите описание задачи',
+          create: 'Создать задачу',
+        },
+        settings: {
+          add: 'Добавить',
+          back: 'Вернуться',
+          newTag: 'Добавить тег',
+          newTaskStatus: 'Добавить статус',
+          settings: 'Настройки',
+          statuses: 'Статусы',
+          tags: 'Теги',
+        },
+        tasks: {
+          title: 'Список задач',
+          myTasks: 'Мои задачи',
+          filters: 'Фильтры',
+          assignedTo: 'Кому',
+          tag: 'Тег',
+          apply: 'Применить',
+          change: 'Изменить',
+          delete: 'Удалить',
+          author: 'Автор',
         },
       },
       user: {

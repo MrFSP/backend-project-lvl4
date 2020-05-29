@@ -2,15 +2,15 @@ extends ../layouts/application.pug
 
 block content
   .container.col-10.justify-content-center
-    h3.mb-3.font-weight-normal.text-center Список задач
+    h3.mb-3.font-weight-normal.text-center= t('views.tasks.tasks.title')
     .row.justify-content-between
       a.nav-link(
         href=route('newTask')
-      ) Создать задачу
+      )= t('views.tasks.new.create')
       button.btn.btn-link.mr-5.pr-3(
         type='submit'
         form='myTask'
-      ) Мои задачи
+      )= t('views.tasks.tasks.myTasks')
         form(
           action=route('tasks')
           method='post'
@@ -26,7 +26,7 @@ block content
         data-target='#collapseForm'
         aria-expanded='false'
         aria-controls='collapseForm'
-      ) Фильтры
+      )= t('views.tasks.tasks.filters')
     #collapseForm.collapse.pb-2
       .col
         form.row(
@@ -40,7 +40,7 @@ block content
                 selected=''
                 disabled=''
                 value=''
-              ) Кому
+              )= t('views.tasks.tasks.assignedTo')
               each user in Object.values(users)
                 option.form-control(
                   value=user.id
@@ -51,7 +51,7 @@ block content
                 selected=''
                 disabled=''
                 value=''
-              ) Статус
+              )= t('views.tasks.change.status')
               each taskStatus in taskStatuses
                 option.form-control(
                   value=taskStatus.name
@@ -62,7 +62,7 @@ block content
                 selected=''
                 disabled=''
                 value=''
-              ) Тег
+              )= t('views.tasks.tasks.tag')
               each tag in tags
                 option.form-control(
                   value=tag.id
@@ -70,7 +70,7 @@ block content
         .row.justify-content-end
           button.btn.btn-outline-primary.mb-1.mr-3(
               form='filterForm',
-            ) Применить
+            )= t('views.tasks.tasks.apply')
     each task in tasks
       div(id=`accordion${task.id}`)
         .card
@@ -89,7 +89,8 @@ block content
                 span.d-flex.align-items-center
                   .badge.badge-primary.ml-1.mr-1() !{task.status}
               .d-flex.align-items-center
-                h6.ml-0.mb-1 Кому: !{task.assignedTo ? users[task.assignedTo].fullName : ''}
+                h6.ml-0.mb-1= t('views.tasks.tasks.assignedTo')
+                h6.ml-0.mb-1 : !{users[task.assignedTo] ? users[task.assignedTo].fullName : ''}
             .row.ml-0.mr-0
               span.d-flex.align-items-top.mt-1
                 .col
@@ -99,7 +100,7 @@ block content
                 button.btn.btn-link.btn-sm.text-primary.mt-1(
                   type='submit'
                   form=`formForTaskChange${task.id}`
-                )= t('Изменить')
+                )= t('views.tasks.tasks.change')
                 form(
                   action=route('changeTask')
                   method='get'
@@ -114,7 +115,7 @@ block content
                   type='submit'
                   form=`formForDeleteTask${task.id}`
                   onclick="return confirm('Вы уверены что хотите удалить задачу?')"
-                )= t('Удалить')
+                )= t('views.tasks.tasks.delete')
                 form(
                   action=route('tasks')
                   method='post'
@@ -135,7 +136,8 @@ block content
             data-parent=`#accordion${task.id}`
             id=`collapse${task.id}`
           )
-            .card-body.mt-0.pt-2.p.pb-0 !{task.description}
+            .card-body.mt-0.pt-2.p.pb-0.ml-3.pl-3 !{task.description}
             .card-body.pb-1
               .d-flex.justify-content-end
-                h6 Автор: !{users[task.creator].fullName}
+                h6= t('views.tasks.tasks.author')
+                h6 : !{users[task.creator] ? users[task.creator].fullName : ''}

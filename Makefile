@@ -13,6 +13,12 @@ start-backend:
 start-frontend:
 	npx webpack-dev-server
 
+test-coverage:
+	npm test -- --runInBand --coverage
+
+lint:
+	npx eslint .
+
 hsp:
 	npm run-script start
 
@@ -28,9 +34,6 @@ ts:
 
 tc:
 	npm test -- --runInBand --coverage --verbose --silent --noStackTrace --debug false
-
-lint:
-	npx eslint .
 
 hl:
 	heroku logs -a task-manager-tm -t --force-colors

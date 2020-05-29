@@ -99,7 +99,7 @@ export default (app) => {
     .post('/tasks/new', async (req, reply) => {
       const { task, tagsForTask } = req.body;
       if (!task.name) {
-        req.flash('info', i18next.t('Введите название задачи'));
+        req.flash('info', i18next.t('flash.tasks.info.empty'));
         return reply.redirect(app.reverse('newTask'));
       }
       const currentUserId = req.session.get('userId');
@@ -152,7 +152,7 @@ export default (app) => {
       const oldTask = JSON.parse(req.body.oldTask);
 
       if (!task.name) {
-        req.flash('info', i18next.t('Введите название задачи'));
+        req.flash('info', i18next.t('flash.tasks.info.empty'));
         return reply.redirect(app.reverse('newTask'));
       }
       const currentUserId = req.session.get('userId');

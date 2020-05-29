@@ -9,33 +9,33 @@ mixin list(items)
 
 block content
   .container.col-md-4.justify-content-center
-    h3.mb-3.font-weight-normal.text-center Настройки
+    h3.mb-3.font-weight-normal.text-center= t('views.tasks.settings.settings')
     form#tagSettings(action=route('settings') method='post')
       .text-center
-        h5 Теги
+        h5=t('views.tasks.settings.tags')
         +list(tags)
       .form-group
-        label(for='formControlInput') Добавить тег
+        label(for='formControlInput')= t('views.tasks.settings.newTag')
         input#formControlInput.form-control(name='newTag[name]' autocomplete='off')
     .d-flex
       button.btn.btn-block.btn-outline-primary(
                 form='tagSettings'
-              ) Добавить
+              )= t('views.tasks.settings.add')
     hr
     form#taskStatus(action=route('settings') method='post')
       .form-group
         .text-center
-          h5 Статусы
+          h5=t('views.tasks.settings.statuses')
           +list(taskStatuses)
-        label(for='formControlInput') Добавить статус
+        label(for='formControlInput')= t('views.tasks.settings.newTaskStatus')
         input#formControlInput.form-control(name='newTaskStatus[name]' autocomplete='off')
     .d-flex
       button.btn.btn-block.btn-outline-primary(
                 form='taskStatus'
-              ) Добавить
+              )= t('views.tasks.settings.add')
     hr
     .d-flex.mb-3
       a.btn.btn-block.btn-primary(
                 href=route('newTask'),
                 method='get',
-              ) Вернуться
+              )= t('views.tasks.settings.back')
