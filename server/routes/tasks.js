@@ -12,9 +12,11 @@ const getUsers = async (app) => {
         .find();
   return usersFromDB.reduce((acc, user) => {
     const value = [user.firstName || '',
-      user.LastName || '',
+      user.lastName || '',
       user.email,
     ].join(' ').replace(/ +/g, ' ').trim();
+    console.log('valuevalue');
+    console.log(value);
     user.fullName = value;
     user.passwordDigest = ''
     return { ...acc, [user.id]: user };
