@@ -170,6 +170,17 @@ describe('Testing session for registered user', () => {
     // expect(res.text.toString()).toEqual(userPagehtml.toString());
   });
 
+  it('Should get page "/tasks"', async () => {
+    const res = await request.agent(server.server)
+      .get('/tasks')
+      .set('cookie', await getCookie(server, currUser))
+      .catch((err) => {
+        console.log(err);
+      });
+    
+    expect(res).toHaveHTTPStatus(200);
+  });
+
   it('Should get page "/tasks/new"', async () => {
     const res = await request.agent(server.server)
       .get('/tasks/new')
