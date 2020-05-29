@@ -22,9 +22,10 @@ export default (app) => {
       req.session.set('userId', user.id);
       req.session.set('userEmail', user.email);
       req.flash('info', i18next.t('flash.session.create.success'));
-      return reply.redirect(app.reverse('root'));
+      return reply.redirect(app.reverse('tasks'));
     })
-    .delete('/session', { name: 'deleteSession' }, (req, reply) => {
+    .delete('/session', (req, reply) => {
+      console.log(req);
       req.session.set('userId', null);
       req.session.set('userEmail', null);
       req.flash('info', i18next.t('flash.session.delete.success'));

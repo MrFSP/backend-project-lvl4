@@ -52,16 +52,10 @@ mixin inputToChangePass(entity, propertyName, errors = [])
 
 mixin submit(form = null)
   .form-group
-    input.btn.btn-lg.btn-primary.btn-block(type='submit')&attributes(attributes)
+    input.btn.btn-lg.btn-outline-primary.btn-block(type='submit')&attributes(attributes)
 
 mixin submitUpdate(form = null)
   input.btn.btn-outline-primary(type='submit')&attributes(attributes)
-
-mixin checkbox
-  .checkbox.mb-3
-    label
-      input(type='checkbox' value='remember-me')
-      |  Remember me
 
 mixin buttonTo(action, method)
   form(action=action, method="post")
@@ -124,14 +118,16 @@ mixin buttonDeleteUser()
                           value=t('views.user.delete.confirmDelete')
                         )
 
-mixin userInfo(user, keys)
-  table.table.text-right
-    tbody
-      tr
-        td.h5 id
-        td.h5 !{user.id}
-        td
-      tr
-        td.h5 email
-        td.h5 !{user.email}
-        td
+mixin changeProp(route, properties, nameOfNewProp)
+  form#settings(action=route(route) method='post')
+    .form-group
+      .text-center
+        h5 Теги
+          each item in properties
+            h6= t(`${item.name}`)
+      label(for='formControlInput')= t(`tasks.settings.${nameOfNewProp}`)
+      input#formControlInput.form-control(name=`${nameOfNewProp}[name]` autocomplete='off')
+  .d-flex.justify-content-right
+    button.btn.btn-link(
+              form='settings'
+            )= t('tasks.settings.add')

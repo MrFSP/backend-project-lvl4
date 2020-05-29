@@ -2,7 +2,11 @@
 
 export default (app) => {
   app
-    .get('/', { name: 'root' }, (_req, reply) => {
-      reply.render('welcome/index');
+    .get('/', { name: 'root' }, (req, reply) => {
+      const userId = req.session.get('userId');
+      if (!userId) {
+        return reply.render('welcome/index');
+      }
+      reply.redirect(app.reverse('tasks'));
     });
 };

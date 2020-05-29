@@ -9,7 +9,7 @@ import fastifyErrorPage from 'fastify-error-page';
 import pointOfView from 'point-of-view';
 import fastifyFormbody from 'fastify-formbody';
 import fastifySecureSession from 'fastify-secure-session';
-import fastifyCookie from 'fastify-cookie';
+// import fastifyCookie from 'fastify-cookie';
 import fastifyFlash from 'fastify-flash';
 import fastifyReverseRoutes from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
@@ -55,7 +55,7 @@ const setUpStaticAssets = (app) => {
   // eslint-disable-next-line no-unused-vars
   const domain = isDevelopment ? 'http://localhost:8080' : '';
   app.register(fastifyStatic, {
-    root: path.join(__dirname, '..', 'dist', 'public'),
+    root: path.join(__dirname, '..', 'public'),
     prefix: '/assets/',
   });
 };

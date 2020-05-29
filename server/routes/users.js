@@ -14,33 +14,6 @@ export default (app) => {
       reply.render('users/index', { users });
       return reply;
     })
-    .get('/users/new', { name: 'newUser' }, async (req, reply) => {
-      // const params = buildFromModel(User.rawAttributes);
-      const user = new User();
-      reply.render('users/new', { user });
-      return reply;
-    })
-    .get('/users/password', { name: 'password' }, async (req, reply) => {
-      const pass = {
-        oldPass: '',
-        newPass: '',
-        confirmNewPass: '',
-      }
-      const passKeys = Object.keys(pass)
-      return reply.render('users/password/index', { pass, passKeys });
-    })
-    .get('/users/user', { name: 'user' }, async (req, reply) => {
-      const userId = req.session.get('userId');
-
-      const user = await app.orm
-        .getRepository(User)
-        .findOne(userId);
-
-      const keys = Object.keys(user)
-        .filter((key) => !['passwordDigest', 'id'].includes(key));
-
-      return reply.render('users/user', { user, keys });
-    })
     .post('/users', async (req, reply) => {
       const user = User.create(req.body.user);
       user.password = req.body.user.password;
@@ -64,7 +37,21 @@ export default (app) => {
         throw err;
       }
     })
-    .post('/users/password/index', { name: 'userUpdatePassword' }, async (req, reply) => {
+    .get('/users/new', { name: 'newUser' }, async (req, reply) => {
+      const user = new User();
+      reply.render('users/new', { user });
+      return reply;
+    })
+    .get('/users/password', { name: 'password' }, async (req, reply) => {
+      const pass = {
+        oldPass: '',
+        newPass: '',
+        confirmNewPass: '',
+      }
+      const passKeys = Object.keys(pass)
+      return reply.render('users/password/index', { pass, passKeys });
+    })
+    .post('/users/password', async (req, reply) => {
       const pass = req.body.object;
       const userId = req.session.get('userId');
       const user = await app.orm
@@ -91,8 +78,20 @@ export default (app) => {
       reply.redirect(app.reverse('user'));
       return;
     })
-    .post('/users/user', { name: 'userUpdate' }, async (req, reply) => {
-      const user = req.body.user;
+    .get('/users/user', { name: 'user' }, async (req, reply) => {
+      const userId = req.session.get('userId');
+
+      const user = await app.orm
+        .getRepository(User)
+        .findOne(userId);
+
+      const keys = Object.keys(user)
+        .filter((key) => !['passwordDigest', 'id'].includes(key));
+
+      return reply.render('users/user', { user, keys });
+    })
+    .post('/users/user', async (req, reply) => {
+      const { user } = req.body;
       const userId = req.session.get('userId');
       await app.orm
         .createQueryBuilder()

@@ -13,29 +13,27 @@ start-backend:
 start-frontend:
 	npx webpack-dev-server
 
-heroku-start:
-	npm install
-	npm run build-configs
-	npm run build-server
-	npm run start
+test-coverage:
+	npm test -- --runInBand --coverage
 
-heroku-start1:
-	rm -rf ./dist
-	npm run build-configs
-	npm run build-server
-	npm run start
+lint:
+	npx eslint .
+
+hsp:
+	npm run-script start
+
+hsl:
+	npm run build
+	npm run-script start
 
 t:
-	npm run test -- --verbose
+	npm run test -- --verbose --runInBand
 
 ts:
 	npm run test -- --verbose --silent --noStackTrace --debug false
 
 tc:
-	npm test -- --verbose --silent --coverage
-
-lint:
-	npx eslint .
+	npm test -- --runInBand --coverage --verbose --silent --noStackTrace --debug false
 
 hl:
 	heroku logs -a task-manager-tm -t --force-colors
@@ -43,4 +41,4 @@ hl:
 am:
 	git add .
 	git commit --amend
-	git push -f origin feature/step_1_fastify
+	git push -f origin feature/step_3
