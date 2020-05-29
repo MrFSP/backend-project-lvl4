@@ -2,6 +2,7 @@ import request from 'supertest';
 import matchers from 'jest-supertest-matchers';
 import { promises as fs } from 'fs';
 import path from 'path';
+import _ from 'lodash';
 // import faker from 'faker';
 import User from '../server/entity/User';
 import Task from '../server/entity/Task';
@@ -67,31 +68,29 @@ const getCookie = async (server, user) => {
 
 const pathToFixtures = path.join(__dirname, '__fixtures__');
 
-// let logoutPagehtml;
-// let settingsPagehtml;
+
 // let afterSignInPagehtml;
-// let userPagehtml;
-// let newTaskPagehtml;
-// let changePassPagehtml;
 // let changeTaskPagehtml;
 let filteredTaskPagehtml;
 
-describe('Testing session for registered user', () => {
+describe('Testing changes in app', () => {
   let server;
 
   beforeAll(async () => {
-    // logoutPagehtml = await fs.readFile(path.join(pathToFixtures, 'logout-page.html'));
-    // settingsPagehtml = await fs.readFile(path.join(pathToFixtures, 'settings-page.html'));
     // afterSignInPagehtml = await fs.readFile(path.join(pathToFixtures, 'after-sign-in-page.html'));
-    // userPagehtml = await fs.readFile(path.join(pathToFixtures, 'user-page.html'));
-    // newTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'newtask-page.html'));
-    // changePassPagehtml = await fs.readFile(path.join(pathToFixtures, 'change-pass-page.html'));
     // changeTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'change-task-page.html'));
     filteredTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'filtered-task-page.html'));
 
     expect.extend(matchers);
     server = app();
     await server.ready();
+
+    await request.agent(server.server)
+    .post('/users')
+    .send({ user: currUser })
+    .catch((err) => {
+      console.log(err);
+    });
   });
 
   beforeEach(async () => {
@@ -102,55 +101,6 @@ describe('Testing session for registered user', () => {
 
   // });
 
-  it('User should be registered', async () => {
-    await request.agent(server.server)
-      .post('/users')
-      .set('Content-Type', 'application/json')
-      .send({ user: currUser })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const userFromDb = await User.findOne({ where: { email: currUser.email } });
-
-    expect(userFromDb.email).toEqual(currUser.email);
-    expect(userFromDb.passwordDigest).toEqual(encrypt(currUser.password));
-  });
-
-  it('Should deny registration with exists email', async () => {
-    await request.agent(server.server)
-      .post('/users')
-      .send({ user: currUser })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const usersFromDb = await User.find();
-
-    expect(usersFromDb.length).toEqual(1);
-  });
-
-  it('should return 404', async () => {
-    const res = await request.agent(server.server)
-      .get('/wrong-path')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-    expect(res).toHaveHTTPStatus(404);
-  });
-
-  it('Should get new session', async () => {
-    const res = await request.agent(server.server)
-      .post('/session')
-      .send({ object: currUser })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    expect(res).toHaveHTTPStatus(302);
-  });
-
   it('Should deny creating new session', async () => {
     const res = await request.agent(server.server)
       .post('/session')
@@ -160,52 +110,6 @@ describe('Testing session for registered user', () => {
       });
 
     expect(res).toHaveHTTPStatus(200);
-  });
-
-  it('Should return current session', async () => {
-    const res = await request.agent(server.server)
-      .get('/users/user')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-
-    expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(userPagehtml.toString());
-  });
-
-  it('User should be redirected to "/tasks"', async () => {
-    const res = await request.agent(server.server)
-      .get('/')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-
-    expect(res).toHaveHTTPStatus(302);
-  });
-
-  it('Should get page "/tasks"', async () => {
-    const res = await request.agent(server.server)
-      .get('/tasks')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-    
-    expect(res).toHaveHTTPStatus(200);
-  });
-
-  it('Should get page "/tasks/new"', async () => {
-    const res = await request.agent(server.server)
-      .get('/tasks/new')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-    
-    expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(newTaskPagehtml.toString());
   });
 
   it('Should set new tag', async () => {
@@ -276,18 +180,6 @@ describe('Testing session for registered user', () => {
     expect(successResponse3).toHaveHTTPStatus(302);
     expect(statuses.length).toBe(1);
     expect(status.name).toEqual(newTaskStatus.name);
-  });
-
-  it('Should get page "/tasks/settings"', async () => {
-    const res = await request.agent(server.server)
-      .get('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-    
-    expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(settingsPagehtml.toString());
   });
 
   it('Should create new task', async () => {
@@ -383,19 +275,6 @@ describe('Testing session for registered user', () => {
     expect(res.text.toString()).toEqual(filteredTaskPagehtml.toString());
   });
 
-
-  it('Should get page for changing password', async () => {
-    const res = await request.agent(server.server)
-      .get('/users/password')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-
-    expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(changePassPagehtml.toString());
-  });
-
   it('Should get changed password', async () => {
     await request.agent(server.server)
       .post('/users/password')
@@ -440,17 +319,6 @@ describe('Testing session for registered user', () => {
     expect(userFromDb.lastName).toEqual(changedUser.lastName);
   });
 
-  it('Should delete current session', async () => {
-    const res = await request.agent(server.server)
-      .delete('/session')
-      .catch((err) => {
-        console.log(err);
-      });
-    
-    expect(res).toHaveHTTPStatus(302);
-    // expect(res.text.toString()).toEqual(logoutPagehtml.toString());
-  });
-
   it('Should delete task', async () => {
     const taskForDeleting = {
       name: `taskForDeleting${newTask.name}`,
@@ -484,35 +352,9 @@ describe('Testing session for registered user', () => {
     expect(isTaskForDeletingExistsAfterQuery).toBe(false);
   });
 
-  it('Should delete current user', async () => {
-    await request.agent(server.server)
-      .post('/users')
-      .set('Content-Type', 'application/json')
-      .send({ user: currUser })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const currUserFromDb = await User.findOne({ where: { email: currUser.email } });
-    const isCurrUserExistsBeforeDelQuery = currUserFromDb ? true : false;
-
-    await request.agent(server.server)
-      .delete('/users/user')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const currUserFromDbAfterQuery = await User.findOne({ where: { email: currUser.email } })
-    const isCurrUserExistsAfterQuery = currUserFromDbAfterQuery ? true : false;
-
-    expect(isCurrUserExistsBeforeDelQuery).toBe(true);
-    expect(isCurrUserExistsAfterQuery).toBe(false);
-  });
-
   afterAll(async () => {
     await server.close();
-    await fs.unlink(path.join(__dirname, 'database.sqlite'));
+    await fs.unlink(path.join(__dirname, 'database.sqlite')).catch(_.noop);
   });
 
 });
