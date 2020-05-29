@@ -79,6 +79,8 @@ const redirectGuests = (app, req, reply) => {
     '/session',
     '/session/new',
     '/users/new',
+    '/assets/main.js',
+    '/assets/main.css',
   ].includes(req.raw.originalUrl)
   ? true
   : false;
