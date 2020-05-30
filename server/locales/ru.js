@@ -92,7 +92,7 @@ module.exports = {
           title: 'Список задач',
           myTasks: 'Мои задачи',
           filters: 'Фильтры',
-          assignedTo: 'Кому',
+          assignedTo: 'Кому:',
           tag: 'Тег',
           apply: 'Применить',
           change: 'Изменить',
