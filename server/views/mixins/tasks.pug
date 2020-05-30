@@ -128,6 +128,54 @@ mixin selectAssignedTo(assignedTo)
             value=user.id
           )= t(`${user.fullName}`)
 
+mixin btnTag(tag)
+  button.btn.badge.badge-pill.badge-success.ml-1.mr-1(
+    type='submit'
+    form=`myTaskTag${tag.name}`
+  ) !{tag.name}
+    form(
+      action=route('tasks')
+      method='post'
+      id=`myTaskTag${tag.name}`
+    )
+      input(
+        name='filter[tag]'
+        value=tag.id
+        type='hidden'
+      )
+
+mixin btnTaskStatus(task)
+  button.btn.badge.badge-primary.ml-1.mr-1()(
+    type='submit'
+    form=`myTaskStatus${task.status}`
+  ) !{task.status}
+    form(
+      action=route('tasks')
+      method='post'
+      id=`myTaskStatus${task.status}`
+    )
+      input(
+        name='filter[taskStatus]'
+        value=task.status
+        type='hidden'
+      )
+
+mixin btnAssignedToFilter(task, users)
+  button.h6.btn.btn-link.text-dark.my-0.py-0.ml-1.px-0(
+    type='submit'
+    form=`myTaskAssignedTo${task.assignedTo}`
+  ) !{users[task.assignedTo] ? users[task.assignedTo].fullName : ''}
+    form(
+      action=route('tasks')
+      method='post'
+      id=`myTaskAssignedTo${task.assignedTo}`
+    )
+      input(
+        name='filter[assignedTo]'
+        value=task.assignedTo
+        type='hidden'
+      )
+
 mixin taskCard(task)
   div(id=`accordion${task.id}`)
           .card
@@ -144,15 +192,15 @@ mixin taskCard(task)
                       aria-controls=`collapse${task.id}`
                     )= t(task.name)
                   span.d-flex.align-items-center
-                    .badge.badge-primary.ml-1.mr-1() !{task.status}
+                    +btnTaskStatus(task)
                 .d-flex.align-items-center
-                  h6.ml-0.mb-1= t('views.tasks.tasks.assignedTo')
-                  h6.ml-0.mb-1.ml-1 !{users[task.assignedTo] ? users[task.assignedTo].fullName : ''}
+                  h6.ml-0.my-0= t('views.tasks.tasks.assignedTo')
+                  +btnAssignedToFilter(task, users)
               .row.ml-0.mr-0
                 span.d-flex.align-items-top.mt-1
                   .col
                     each tag in task.tags
-                      .badge.badge-pill.badge-success.ml-1.mr-1 !{tag.name}
+                      +btnTag(tag)
                 .col
                   button.btn.btn-link.btn-sm.text-primary.mt-1(
                     type='submit'
