@@ -21,18 +21,26 @@ const getUsers = async (app) => {
   }, {});
 };
 
-const filterTasks = (tasks, filter) => {
+export const filterTasks = (tasks, filter) => {
   if (!filter) {
     return tasks;
   }
   if (filter.assignedTo) {
-    tasks = tasks.filter((task) => task.assignedTo === filter.assignedTo);
+    tasks = tasks.filter((task) => {
+      if (!task.assignedTo) {
+        return false;
+      }
+      return task.assignedTo === filter.assignedTo
+    });
   }
   if (filter.taskStatus) {
     tasks = tasks.filter((task) => task.status === filter.taskStatus);
   }
   if (filter.tag) {
     tasks = tasks.filter((task) => {
+      if (!task.tags) {
+        return false;
+      }
       const taskTags = task.tags;
       return taskTags.find((tag) => tag.id == filter.tag);
     });
