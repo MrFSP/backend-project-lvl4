@@ -1,4 +1,5 @@
 extends ../layouts/application.pug
+include ../mixins/tasks.pug
 
 block content
   .container.col-10.justify-content-center
@@ -38,110 +39,12 @@ block content
           method='post'
           id='filterForm'
         )
-          .form-group.col-md-4.mb-2
-            select.form-control(name='filter[assignedTo]')
-              option.form-control(
-                selected=''
-                disabled=''
-                value=''
-              )= t('views.tasks.tasks.assignedTo')
-              each user in Object.values(users)
-                option.form-control(
-                  value=user.id
-                )= t(`${user.fullName}`)
-          .form-group.col-md-4.mb-2
-            select.form-control(name='filter[taskStatus]')
-              option.form-control(
-                selected=''
-                disabled=''
-                value=''
-              )= t('views.tasks.change.status')
-              each taskStatus in taskStatuses
-                option.form-control(
-                  value=taskStatus.name
-                )= t(`${taskStatus.name}`)
-          .form-group.col-md-4.mb-2
-            select.form-control(name='filter[tag]')
-              option.form-control(
-                selected=''
-                disabled=''
-                value=''
-              )= t('views.tasks.tasks.tag')
-              each tag in tags
-                option.form-control(
-                  value=tag.id
-                )= t(`${tag.name}`)
+          +filterByUser(users)
+          +filterByTaskStatus(taskStatuses)
+          +filterByTag(tags)
         .row.justify-content-end
           button.btn.btn-outline-primary.mb-1.mr-3(
               form='filterForm',
             )= t('views.tasks.tasks.apply')
     each task in tasks
-      div(id=`accordion${task.id}`)
-        .card
-          .card-header.row.ml-0.mr-0.pt-0.pb-1.justify-content-between(
-            id=`heading${task.id}`
-          )
-            .col.ml-0.mr-0
-              .row
-                .mb-0
-                  .btn.btn-link.collapsed(
-                    data-toggle='collapse'
-                    data-target=`#collapse${task.id}`
-                    aria-expanded='false'
-                    aria-controls=`collapse${task.id}`
-                  )= t(task.name)
-                span.d-flex.align-items-center
-                  .badge.badge-primary.ml-1.mr-1() !{task.status}
-              .d-flex.align-items-center
-                h6.ml-0.mb-1= t('views.tasks.tasks.assignedTo')
-                h6.ml-0.mb-1.ml-1 !{users[task.assignedTo] ? users[task.assignedTo].fullName : ''}
-            .row.ml-0.mr-0
-              span.d-flex.align-items-top.mt-1
-                .col
-                  each tag in task.tags
-                    .badge.badge-pill.badge-success.ml-1.mr-1 !{tag.name}
-              .col
-                button.btn.btn-link.btn-sm.text-primary.mt-1(
-                  type='submit'
-                  form=`formForTaskChange${task.id}`
-                )= t('views.tasks.tasks.change')
-                form(
-                  action=route('changeTask')
-                  method='get'
-                  id=`formForTaskChange${task.id}`
-                )
-                  input(
-                    name='taskId'
-                    value=task.id
-                    type='hidden'
-                  )
-                button.btn.btn-link.btn-sm.text-danger(
-                  type='submit'
-                  form=`formForDeleteTask${task.id}`
-                  onclick="return confirm('Вы уверены что хотите удалить задачу?')"
-                )= t('views.tasks.tasks.delete')
-                form(
-                  action=route('tasks')
-                  method='post'
-                  id=`formForDeleteTask${task.id}`
-                )
-                  input(
-                    name='taskID'
-                    value=task.id
-                    type='hidden'
-                  )
-                  input(
-                    name="_method"
-                    type="hidden"
-                    value='delete'
-                  )
-          .collapse(
-            aria-labelledby=`heading${task.id}`
-            data-parent=`#accordion${task.id}`
-            id=`collapse${task.id}`
-          )
-            .card-body.mt-0.pt-2.p.pb-0.ml-3.pl-3 !{task.description}
-            .card-body.pb-1
-              .d-flex.justify-content-end
-                h6= t('views.tasks.tasks.author')
-                h6 : !{users[task.creator] ? users[task.creator].fullName : ''}
+      +taskCard(task)
