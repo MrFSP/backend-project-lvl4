@@ -161,7 +161,7 @@ mixin btnTaskStatus(task)
       )
 
 mixin btnAssignedToFilter(task, users)
-  button.h6.btn.btn-link.text-dark.my-0.py-0.ml-1.px-0(
+  button.h6.btn.btn-link.shadow-none.border-0.text-dark.my-0.py-0.ml-1.px-0(
     type='submit'
     form=`myTaskAssignedTo${task.assignedTo}`
   ) !{users[task.assignedTo] ? users[task.assignedTo].fullName : ''}
@@ -185,7 +185,7 @@ mixin taskCard(task)
               .col.ml-0.mr-0
                 .row
                   .mb-0
-                    .btn.btn-link.collapsed(
+                    .btn.btn-link.shadow-none.border-0.collapsed(
                       data-toggle='collapse'
                       data-target=`#collapse${task.id}`
                       aria-expanded='false'
@@ -202,7 +202,7 @@ mixin taskCard(task)
                     each tag in task.tags
                       +btnTag(tag)
                 .col
-                  button.btn.btn-link.btn-sm.text-primary.mt-1(
+                  button.btn.btn-link.btn-sm.shadow-none.border-0.text-primary.mt-1(
                     type='submit'
                     form=`formForTaskChange${task.id}`
                   )= t('views.tasks.tasks.change')
@@ -216,7 +216,7 @@ mixin taskCard(task)
                       value=task.id
                       type='hidden'
                     )
-                  button.btn.btn-link.btn-sm.text-danger(
+                  button.btn.btn-link.btn-sm.shadow-none.border-0.text-danger(
                     type='submit'
                     form=`formForDeleteTask${task.id}`
                     onclick="return confirm('Вы уверены что хотите удалить задачу?')"

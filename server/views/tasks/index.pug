@@ -4,15 +4,15 @@ include ../mixins/tasks.pug
 block content
   .container.col-10.justify-content-center
     .row.justify-content-center
-      a.btn.text-lg.mb-0(
+      a.btn.shadow-none.border-0.mb-0(
         href=route('tasks')
       )
-        h4= t('views.tasks.tasks.title')
+        .h3= t('views.tasks.tasks.title')
     .row.justify-content-between
       a.nav-link(
         href=route('newTask')
       )= t('views.tasks.new.create')
-      button.btn.btn-link.mr-5.pr-3(
+      button.btn.btn-link.shadow-none.border-0.mr-5.pr-3(
         type='submit'
         form='myTask'
       )= t('views.tasks.tasks.myTasks')
@@ -26,7 +26,7 @@ block content
             value=reply.request.session.get('userId')
             type='hidden'
           )
-      .btn.btn-link.collapsed(
+      .btn.btn-link.shadow-none.border-0.collapsed(
         data-toggle='collapse'
         data-target='#collapseForm'
         aria-expanded='false'
