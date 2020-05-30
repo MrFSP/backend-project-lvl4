@@ -215,14 +215,6 @@ describe('Testing responses for User', () => {
   });
 
   it('Should delete current user', async () => {
-    await request.agent(server.server)
-      .post('/users')
-      .set('Content-Type', 'application/json')
-      .send({ user: currUser })
-      .catch((err) => {
-        console.log(err);
-      });
-
     const currUserFromDb = await User.findOne({ where: { email: currUser.email } });
     const isCurrUserExistsBeforeDelQuery = currUserFromDb ? true : false;
 

@@ -68,7 +68,6 @@ const getCookie = async (server, user) => {
 
 const pathToFixtures = path.join(__dirname, '__fixtures__');
 
-
 // let afterSignInPagehtml;
 // let changeTaskPagehtml;
 let filteredTaskPagehtml;
