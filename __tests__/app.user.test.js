@@ -133,6 +133,18 @@ describe('Testing responses for User', () => {
     expect(res).toHaveHTTPStatus(302);
   });
 
+  it('Should return page "/users"', async () => {
+    const res = await request.agent(server.server)
+      .get('/users')
+      .set('cookie', await getCookie(server, currUser))
+      .catch((err) => {
+        console.log(err);
+      });
+
+    expect(res).toHaveHTTPStatus(200);
+    // expect(res.text.toString()).toEqual(userPagehtml.toString());
+  });
+
   it('Should return page "/users/user"', async () => {
     const res = await request.agent(server.server)
       .get('/users/user')
