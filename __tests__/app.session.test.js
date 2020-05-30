@@ -274,6 +274,46 @@ describe('Testing changes in app', () => {
     expect(res.text.toString()).toEqual(filteredTaskPagehtml.toString());
   });
 
+  it('Should not change password', async () => {
+    const userFromDbBeforeRequest = await User
+      .findOne({ where: { email: currUser.email } });
+
+      const res1 = await request.agent(server.server)
+      .post('/users/password')
+      .set('cookie', await getCookie(server, currUser))
+      .send({
+        object: {
+          oldPass: 'wrongPassword',
+          newPass: changedUser.password,
+          confirmNewPass: changedUser.password,
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const res2 = await request.agent(server.server)
+      .post('/users/password')
+      .set('cookie', await getCookie(server, currUser))
+      .send({
+        object: {
+          oldPass: currUser.password,
+          newPass: 'newPassword',
+          confirmNewPass: 'wrongRepeatedPassword',
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const userFromDbAfterRequest = await User.findOne({ where: { email: currUser.email } });
+
+    expect(userFromDbBeforeRequest.passwordDigest)
+      .toEqual(userFromDbAfterRequest.passwordDigest);
+    expect(res1).toHaveHTTPStatus(302);
+    expect(res2).toHaveHTTPStatus(302);
+  });
+
   it('Should get changed password', async () => {
     await request.agent(server.server)
       .post('/users/password')
@@ -281,6 +321,20 @@ describe('Testing changes in app', () => {
       .send({
         object: {
           oldPass: currUser.password,
+          newPass: changedUser.password,
+          confirmNewPass: changedUser.password,
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await request.agent(server.server)
+      .post('/users/password')
+      .set('cookie', await getCookie(server, currUser))
+      .send({
+        object: {
+          oldPass: 'wrongPassword',
           newPass: changedUser.password,
           confirmNewPass: changedUser.password,
         }

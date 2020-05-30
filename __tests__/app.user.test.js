@@ -142,7 +142,6 @@ describe('Testing responses for User', () => {
       });
 
     expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(userPagehtml.toString());
   });
 
   it('Should return page "/users/user"', async () => {
