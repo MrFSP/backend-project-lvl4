@@ -24,3 +24,87 @@ mixin settingForm(properties, type)
     button.btn.btn-block.btn-outline-primary(
               form='settings'
             )= t('views.tasks.settings.add')
+
+//- mixins for
+
+mixin oldtask(task)
+  input#FormControlInput1.form-control.data-bv-notempty-message(
+    name='oldTask'
+    value=task
+    type='hidden'
+  )
+
+mixin inputTaskName(taskName = '')
+  .form-group
+    label(
+      for='FormControlInput1'
+    )= t('views.tasks.change.taskName')
+    input#FormControlInput1.form-control.data-bv-notempty-message(
+      name='task[name]'
+      autocomplete='off'
+      value=taskName
+    )
+
+mixin selectTaskStatus(taskStatus)
+  .form-group.col.mb-3.pl-0
+    label(
+      for='inlineFormCustomSelect'
+    )= t('views.tasks.change.status')
+    select#inlineFormCustomSelect.flex-row.w-auto.form-control(name='task[status]')
+      option.form-control(
+        value=taskStatus
+        selected=''
+      )= t(`${taskStatus}`)
+      each taskStatus in taskStatuses
+        option.form-control(
+          value=taskStatus.name
+        )= t(`${taskStatus.name}`)
+
+mixin selectedTags(tags)
+  each tag in tags
+    .form-check
+      input.form-check-input(
+        type='checkbox'
+        id=`${tag.name}`
+        name='tagsForTask[name]'
+        value=tag.name
+        checked=''
+      )
+      label.form-check-label(
+        for=`${tag.name}`
+      )= t(`${tag.name}`)
+
+mixin selectTags(taskTags)
+  .form-group.col.mb-2.pl-0
+    label.mb-1= t('views.tasks.settings.tags')
+    .row.ml-0
+      +selectedTags(taskTags)
+      each tag in tags
+        .form-check.ml-2
+          input.form-check-input(
+            type='checkbox'
+            id=`${tag.name}`
+            name='tagsForTask[name]'
+            value=tag.name
+          )
+          label.form-check-label(
+            for=`${tag.name}`
+          )= t(`${tag.name}`)
+
+mixin selectAssignedTo(assignedTo)
+  .form-group
+    select#inlineFormCustomSelect.w-100.form-control(
+      name='task[assignedTo]'
+      required=''
+    )
+      option.form-control(
+        name='assignedTo[id]'
+        value=`${assignedTo}`
+        selected=''
+      )= t(`${users[assignedTo] ? users[assignedTo].fullName : ''}`)
+      each user in users
+        if user.id != assignedTo
+          option.form-control(
+            name='assignedTo[id]'
+            value=user.id
+          )= t(`${user.fullName}`)

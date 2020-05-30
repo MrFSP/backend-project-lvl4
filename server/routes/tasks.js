@@ -15,8 +15,6 @@ const getUsers = async (app) => {
       user.lastName || '',
       user.email,
     ].join(' ').replace(/ +/g, ' ').trim();
-    console.log('valuevalue');
-    console.log(value);
     user.fullName = value;
     user.passwordDigest = ''
     return { ...acc, [user.id]: user };
@@ -134,10 +132,19 @@ export default (app) => {
     })
     .get('/tasks/change', { name: 'changeTask' }, async (req, reply) => {
       const { taskId } = req.query;
-      const users = await app.orm.getRepository(User).find();
-      const tags = await app.orm.getRepository(Tag).find();
-      const taskStatuses = await app.orm.getRepository(TaskStatus).find();
+      const users = await getUsers(app);
+      const allTags = await app.orm.getRepository(Tag).find();
+      const allTaskStatuses = await app.orm.getRepository(TaskStatus).find();
+      
       const task = await app.orm.getRepository(Task).findOne({ id: taskId })
+
+      const namesOfSelectedTags = task.tags.map((t) => t.name)
+      const tags = allTags
+        .filter((t) => !namesOfSelectedTags.includes(t.name));
+
+      const taskStatuses = allTaskStatuses
+        .filter((ts) => ts.name !== task.status)
+
       return reply.render(
         'tasks/change',
          { users, tags, taskStatuses, task},
@@ -153,24 +160,20 @@ export default (app) => {
         return reply.redirect(app.reverse('newTask'));
       }
       const currentUserId = req.session.get('userId');
-
-      try {
-        await app.orm
-          .createQueryBuilder()
-          .update(Task)
-          .set({
-            name: task.name,
-            description: task.description || '',
-            status: task.status,
-            assignedTo: task.assignedTo || '',
-            creator: currentUserId,
-          })
-          .where("id = :id", { id: oldTask.id })
-          .execute();
-        return reply.redirect(app.reverse('tasks'));
-      } catch (err) {
-        console.log(err);
-      }
+      
+      await app.orm
+        .createQueryBuilder()
+        .update(Task)
+        .set({
+          name: task.name,
+          description: task.description || '',
+          status: task.status,
+          assignedTo: task.assignedTo || '',
+          creator: currentUserId,
+        })
+        .where("id = :id", { id: oldTask.id })
+        .execute();
+      return reply.redirect(app.reverse('tasks'));
     })
     .get('/tasks/settings', { name: 'settings' }, async (req, reply) => {
       const tags = await app.orm.getRepository(Tag).find();

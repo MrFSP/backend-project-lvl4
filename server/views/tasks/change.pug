@@ -1,50 +1,23 @@
 extends ../layouts/application.pug
+include ../mixins/tasks.pug
 
 block content
   .container.col-6.justify-content-center
     h3.mb-3.font-weight-normal.text-center= t('views.tasks.change.title')
-    form#task(action=route('changeTask') method='post')
-      input#FormControlInput1.form-control.data-bv-notempty-message(
-        name='oldTask'
-        value=task
-        type='hidden'
-      )
-      .form-group
-        label(for='FormControlInput1')= t('views.tasks.change.taskName')
-        input#FormControlInput1.form-control.data-bv-notempty-message(
-                                              name='task[name]'
-                                              autocomplete='off'
-                                              value=task.name
-                                              )
-      label(for='inlineFormCustomSelect')= t('views.tasks.change.status')
-      .form-group.d-flex.pb-2
-        select#inlineFormCustomSelect.col-md-4.form-control(name='task[status]')
-          each taskStatus in taskStatuses
-            option.form-control(value=taskStatus.name)= t(`${taskStatus.name}`)
-      label= t('views.tasks.settings.tags')
-      .form-group.justify-content-between.mb-0
-        each tag in tags
-          input.ml-2.mr-2(type='checkbox' name='tagsForTask[name]' value=tag.name)
-          label= t(`${tag.name}`)
+    form#task(
+      action=route('changeTask')
+      method='post'
+    )
+      +oldtask(task)
+      +inputTaskName(task.name)
+      +selectTaskStatus(task.status)
+      +selectTags(task.tags)
       .form-group
         textarea.form-control(
-                  name='task[description]'
-                  rows="6"
-                  )= t(task.description)
-      .form-group
-        select#inlineFormCustomSelect.w-100.form-control(
-                  name='task[assignedTo]'
-                  required=''
-                  )
-          option(
-            selected=''
-            disabled=''
-          )= t('views.tasks.change.assignedto')
-          each user in users
-            option.form-control(
-                    name='assignedTo[id]'
-                    value=user.id
-                  )= t(`${user.firstName || ''} ${user.lastName || ''} ${user.email}`)
+          name='task[description]'
+          rows="6"
+        )= t(task.description)
+      +selectAssignedTo(task.assignedTo)
     hr
     .d-flex.justify-content-between
       a.btn.btn-link(
