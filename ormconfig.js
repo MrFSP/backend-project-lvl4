@@ -20,7 +20,6 @@ const sqlite = {
   },
 };
 
-
 const postgre = {
    type: "postgres",
    host: "localhost",
