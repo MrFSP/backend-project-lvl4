@@ -75,12 +75,17 @@ module.exports = {
           create: 'Создать задачу',
         },
         settings: {
+          newTag: {
+            name: 'Теги',
+            add: 'Добавить тег',
+          },
+          newTaskStatus: {
+            name: 'Статусы',
+            add: 'Добавить статус',
+          },
           add: 'Добавить',
           back: 'Вернуться',
-          newTag: 'Добавить тег',
-          newTaskStatus: 'Добавить статус',
           settings: 'Настройки',
-          statuses: 'Статусы',
           tags: 'Теги',
         },
         tasks: {

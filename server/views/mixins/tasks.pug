@@ -1,0 +1,26 @@
+mixin list(items)
+  table.table.table-striped.table-bordered.table-sm
+    each item in items
+      tr
+        td= t(`${item.name}`)
+
+mixin settingForm(properties, type)
+  form#settings(
+    action=route('settings')
+    method='post'
+  )
+    .text-center
+      h5=t(`views.tasks.settings.${type}.name`)
+      +list(properties)
+    .form-group
+      label(
+        for='formControlInput'
+      )= t(`views.tasks.settings.${type}.add`)
+      input#formControlInput.form-control(
+        name=`${type}[name]`
+        autocomplete='off'
+      )
+  .d-flex
+    button.btn.btn-block.btn-outline-primary(
+              form='settings'
+            )= t('views.tasks.settings.add')
