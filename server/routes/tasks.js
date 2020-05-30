@@ -40,6 +40,25 @@ const filterTasks = (tasks, filter) => {
   return tasks;
 };
 
+const getTags = async (app, tagsForTask) => {
+  const tagsNames = tagsForTask ? tagsForTask.name : null;
+  let tags;
+  if (Array.isArray(tagsNames)) {
+    tags = tagsNames.map(async (name) => {
+      const tag = await app.orm
+        .getRepository(Tag)
+        .findOne({ name: name });
+      return tag;
+    });
+  } else if (tagsNames) {
+    const tag = await app.orm
+    .getRepository(Tag)
+    .findOne({ name: tagsNames });
+    tags = [tag];
+  }
+  return tagsNames ? await Promise.all(tags) : null;
+};
+
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks' }, async (req, reply) => {
@@ -103,21 +122,6 @@ export default (app) => {
         return reply.redirect(app.reverse('newTask'));
       }
       const currentUserId = req.session.get('userId');
-      const tagsNames = tagsForTask ? tagsForTask.name : null;
-      let tags;
-      if (Array.isArray(tagsNames)) {
-        tags = tagsNames.map(async (name) => {
-          const tag = await app.orm
-            .getRepository(Tag)
-            .findOne({ name: name });
-          return tag;
-        });
-      } else if (tagsNames) {
-        const tag = await app.orm
-        .getRepository(Tag)
-        .findOne({ name: tagsNames });
-        tags = [tag];
-      }
 
       const newTask = new Task();
       newTask.name = task.name;
@@ -126,7 +130,7 @@ export default (app) => {
       newTask.assignedTo = task.assignedTo || '';
       newTask.creator = currentUserId;
 
-      newTask.tags = tagsNames ? await Promise.all(tags) : null;
+      newTask.tags = await getTags(app, tagsForTask);
       await Task.save(newTask);
       return reply.redirect(app.reverse('tasks'));
     })
@@ -151,7 +155,7 @@ export default (app) => {
         );
     })
     .post('/tasks/change', async (req, reply) => {
-      const { task } = req.body;
+      const { task, tagsForTask } = req.body;
 
       const oldTask = JSON.parse(req.body.oldTask);
 
@@ -161,6 +165,11 @@ export default (app) => {
       }
       const currentUserId = req.session.get('userId');
       
+      const taskForChange = await app.orm.getRepository(Task).findOne({ id: oldTask.id });
+      taskForChange.tags = taskForChange.tags.filter((tag) => tag === false);
+      taskForChange.tags = await getTags(app, tagsForTask);
+      await taskForChange.save();
+
       await app.orm
         .createQueryBuilder()
         .update(Task)
