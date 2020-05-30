@@ -84,7 +84,7 @@ export default (app) => {
       return reply.redirect(app.reverse('tasks'));
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
-      const users = await app.orm.getRepository(User).find();
+      const users = await getUsers(app);
       const tags = await app.orm.getRepository(Tag).find();
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
       const task = new Task();

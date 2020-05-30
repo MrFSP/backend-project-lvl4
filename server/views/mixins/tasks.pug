@@ -47,14 +47,21 @@ mixin inputTaskName(taskName = '')
 
 mixin selectTaskStatus(taskStatus)
   .form-group.col.mb-3.pl-0
-    label(
-      for='inlineFormCustomSelect'
-    )= t('views.tasks.change.status')
+    .row.ml-0
+      label(
+        for='inlineFormCustomSelect'
+      )= t('views.tasks.change.status')
+      if !taskStatus
+        a.h6.btn-link.ml-4.mt-1.mb-1(
+          href=route('settings'),
+          method='get',
+        )= t('views.tasks.settings.add')
     select#inlineFormCustomSelect.flex-row.w-auto.form-control(name='task[status]')
-      option.form-control(
-        value=taskStatus
-        selected=''
-      )= t(`${taskStatus}`)
+      if taskStatus
+        option.form-control(
+          value=taskStatus
+          selected=''
+        )= t(`${taskStatus}`)
       each taskStatus in taskStatuses
         option.form-control(
           value=taskStatus.name
@@ -78,10 +85,11 @@ mixin selectTags(taskTags)
   .form-group.col.mb-2.pl-0
     label.mb-1= t('views.tasks.settings.tags')
     .row.ml-0
-      +selectedTags(taskTags)
+      if taskTags
+        +selectedTags(taskTags)
       each tag in tags
         .form-check.ml-2
-          input.form-check-input(
+          input.form-check-input.pt-1(
             type='checkbox'
             id=`${tag.name}`
             name='tagsForTask[name]'
@@ -90,6 +98,11 @@ mixin selectTags(taskTags)
           label.form-check-label(
             for=`${tag.name}`
           )= t(`${tag.name}`)
+      if !taskTags
+        a.h6.btn-link.ml-4.mt-1.mb-1(
+          href=route('settings'),
+          method='get',
+        )= t('views.tasks.settings.add')
 
 mixin selectAssignedTo(assignedTo)
   .form-group
@@ -97,11 +110,17 @@ mixin selectAssignedTo(assignedTo)
       name='task[assignedTo]'
       required=''
     )
-      option.form-control(
-        name='assignedTo[id]'
-        value=`${assignedTo}`
-        selected=''
-      )= t(`${users[assignedTo] ? users[assignedTo].fullName : ''}`)
+      if assignedTo
+        option.form-control(
+          name='assignedTo[id]'
+          value=`${assignedTo}`
+          selected=''
+        )= t(`${users[assignedTo] ? users[assignedTo].fullName : ''}`)
+      if !assignedTo
+        option(
+          selected=''
+          disabled=''
+        )= t('views.tasks.change.assignedto')
       each user in users
         if user.id != assignedTo
           option.form-control(
