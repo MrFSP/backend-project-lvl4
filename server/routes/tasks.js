@@ -131,6 +131,8 @@ export default (app) => {
       newTask.creator = currentUserId;
 
       newTask.tags = await getTags(app, tagsForTask);
+      console.log('newTask.tagsnewTask.tags');
+      console.log(newTask.tags);
       await Task.save(newTask);
       return reply.redirect(app.reverse('tasks'));
     })
@@ -211,10 +213,8 @@ export default (app) => {
         } else if (!value.name) {
           req.flash('error', i18next.t(`flash.tasks.${type}.empty`));
         } else if (!isExists) {
-          await prop.create(value).save();
           req.flash('info', i18next.t(`flash.tasks.${type}.added`));
-        } else {
-          req.flash('error', i18next.t(`flash.tasks.error`));
+          await prop.create(value).save();
         }
       };
 
