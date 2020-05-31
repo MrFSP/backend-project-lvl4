@@ -25,7 +25,6 @@ export default (app) => {
       return reply.redirect(app.reverse('tasks'));
     })
     .delete('/session', (req, reply) => {
-      console.log(req);
       req.session.set('userId', null);
       req.session.set('userEmail', null);
       req.flash('info', i18next.t('flash.session.delete.success'));
