@@ -78,10 +78,13 @@ module.exports = {
           newTag: {
             name: 'Теги',
             add: 'Добавить тег',
+            success: 'Тег удалён',
           },
           newTaskStatus: {
             name: 'Статусы',
             add: 'Добавить статус',
+            exception: 'Этот статус не может быть удалён',
+            success: 'Статус удалён',
           },
           add: 'Добавить',
           back: 'Вернуться',

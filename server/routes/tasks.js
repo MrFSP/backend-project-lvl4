@@ -145,6 +145,8 @@ export default (app) => {
       return reply.redirect(app.reverse('tasks'));
     })
     .get('/tasks/change', { name: 'changeTask' }, async (req, reply) => {
+      console.log('reqreqreq');
+      console.log(req);
       const { taskId } = req.query;
       const users = await getUsers(app);
       const allTags = await app.orm.getRepository(Tag).find();
@@ -226,8 +228,54 @@ export default (app) => {
         }
       };
 
+      console.log('reqreqreq');
+      console.log(newTag);
+      console.log(newTaskStatus);
       newTag ? await trySaveProp(newTag, 'tag') : null;
       newTaskStatus ? await trySaveProp(newTaskStatus, 'status') : null;
+
+      return reply.redirect(app.reverse('settings'));
+    })
+    .delete('/tasks/settings', async (req, reply) => {
+      console.log('reqreqreq');
+      console.log(req);
+      console.log(req.body);
+      const { tagId, taskStatusId } = req.body;
+
+      const deleteTaskStatus = async (app, taskStatusId) => {
+        const status = await app.orm
+          .getRepository(TaskStatus).findOne({ id: taskStatusId });
+        const couldNotDeletedStatuses = [
+          'Новый', 'В работе', 'На тестировании', 'Завершён',
+        ];
+        if (couldNotDeletedStatuses.includes(status.name)) {
+          req.flash('error', i18next.t(`views.tasks.settings.newTaskStatus.exception`));
+          return;
+        }
+        req.flash('info', i18next.t(`views.tasks.settings.newTaskStatus.success`));
+        await app.orm
+          .createQueryBuilder()
+          .delete()
+          .from(TaskStatus)
+          .where("id = :id", { id: status.id })
+          .execute();
+      };
+
+      const deleteTag = async (app, tatId) => {
+        const tag = await app.orm
+          .getRepository(Tag).findOne({ id: tagId });
+
+        req.flash('info', i18next.t(`views.tasks.settings.newTag.success`));
+        await app.orm
+          .createQueryBuilder()
+          .delete()
+          .from(Tag)
+          .where("id = :id", { id: tag.id })
+          .execute();
+      };
+
+      taskStatusId ? await deleteTaskStatus(app, taskStatusId) : null;
+      tagId ? await deleteTag(app, tagId) : null;
 
       return reply.redirect(app.reverse('settings'));
     });

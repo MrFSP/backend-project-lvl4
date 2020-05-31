@@ -29,6 +29,8 @@ const changedUser = {
 const newTag = { name: 'Main' };
 const newTaskStatus = { name: 'tests' };
 const anotherTaskStatus = {name: 'filtered status'};
+const tagForDeletiog = { name: 'tagForDeleting' };
+const taskStatusForDeleting = { name: 'taskStatusForDeleting' };
 
 const newTask = {
   name: 'quaerat',
@@ -146,6 +148,36 @@ describe('Testing changes in app', () => {
     expect(tag.name).toEqual(newTag.name);
   });
 
+  it('Should delete tag', async () => {
+    await request.agent(server.server)
+      .post('/tasks/settings')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ newTag: tagForDeletiog })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const tagBeforeDeleting = await Tag
+      .findOne({ where: { name: tagForDeletiog.name } });
+
+    expect(tagBeforeDeleting.name).toEqual(tagForDeletiog.name);
+
+    await request.agent(server.server)
+      .delete('/tasks/settings')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ tagId: tagBeforeDeleting.id })
+      .catch((err) => {
+        console.log(err);
+      });
+    
+    const tags = await Tag.find();
+    const tag = await Tag
+      .findOne({ where: { name: tagBeforeDeleting.name } });
+    
+    expect(tags.length).toBe(1);
+    expect(tag).toBe(undefined);
+  });
+
   it('Should set new task status', async () => {
     const successResponse1 = await request.agent(server.server)
       .post('/tasks/settings')
@@ -179,6 +211,36 @@ describe('Testing changes in app', () => {
     expect(successResponse3).toHaveHTTPStatus(302);
     expect(statuses.length).toBe(1);
     expect(status.name).toEqual(newTaskStatus.name);
+  });
+
+  it('Should delete task status', async () => {
+    await request.agent(server.server)
+      .post('/tasks/settings')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ newTaskStatus: taskStatusForDeleting })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const statusBeforeDeleting = await TaskStatus
+      .findOne({ where: { name: taskStatusForDeleting.name } });
+
+    expect(statusBeforeDeleting.name).toEqual(taskStatusForDeleting.name);
+
+    await request.agent(server.server)
+      .delete('/tasks/settings')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ taskStatusId: statusBeforeDeleting.id })
+      .catch((err) => {
+        console.log(err);
+      });
+    
+    const statuses = await TaskStatus.find();
+    const status = await TaskStatus
+      .findOne({ where: { name: taskStatusForDeleting.name } });
+    
+    expect(statuses.length).toBe(1);
+    expect(status).toBe(undefined);
   });
 
   it('Should create new task', async () => {

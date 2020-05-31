@@ -4,8 +4,14 @@ include ../../mixins/tasks.pug
 block content
   .container.col-md-4.justify-content-center
     h3.mb-3.text-center= t('views.tasks.settings.settings')
+    .text-center
+      h5=t(`views.tasks.settings.newTag.name`)
+      +list(tags, 'tagId')
     +settingForm(tags, 'newTag')
     hr
+    .text-center
+      h5=t(`views.tasks.settings.newTaskStatus.name`)
+      +list(taskStatuses, 'taskStatusId')
     +settingForm(taskStatuses, 'newTaskStatus')
     hr
     .d-flex.mb-3

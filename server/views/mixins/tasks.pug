@@ -1,17 +1,41 @@
-mixin list(items)
-  table.table.table-striped.table-bordered.table-sm
-    each item in items
-      tr
-        td= t(`${item.name}`)
+mixin list(items, type)
+  each item in items
+    .d-flex.justify-content-center
+      a#navbarDropdown.nav-link.dropdown-toggle.pl-4.text-dark(
+        href='#'
+        role='button'
+        data-toggle='dropdown'
+        aria-haspopup='true'
+        aria-expanded='false'
+      ) !{item.name}
+      .dropdown-menu.text-center.py-1(aria-labelledby='navbarDropdown')
+        button.btn.btn-link.btn-sm.shadow-none.border-0.text-danger(
+          type='submit'
+          form=`formForDeleteItem${item.name}`
+          onclick="return confirm('Вы уверены?')"
+        )= t('views.tasks.tasks.delete')
+        form(
+          action=route('settings')
+          method='post'
+          id=`formForDeleteItem${item.name}`
+        )
+          input(
+            name=type
+            value=item.id
+            type='hidden'
+          )
+          input(
+            name="_method"
+            type="hidden"
+            value='delete'
+          )
 
 mixin settingForm(properties, type)
-  form#settings(
+  form(
     action=route('settings')
     method='post'
+    id=`settings${type}`
   )
-    .text-center
-      h5=t(`views.tasks.settings.${type}.name`)
-      +list(properties)
     .form-group
       label(
         for='formControlInput'
@@ -22,7 +46,7 @@ mixin settingForm(properties, type)
       )
   .d-flex
     button.btn.btn-block.btn-outline-primary(
-              form='settings'
+              form=`settings${type}`
             )= t('views.tasks.settings.add')
 
 //- mixins for
@@ -145,20 +169,21 @@ mixin btnTag(tag)
       )
 
 mixin btnTaskStatus(task)
-  button.btn.badge.badge-primary.ml-1.mr-1()(
-    type='submit'
-    form=`myTaskStatus${task.status}`
-  ) !{task.status}
-    form(
-      action=route('tasks')
-      method='post'
-      id=`myTaskStatus${task.status}`
-    )
-      input(
-        name='filter[taskStatus]'
-        value=task.status
-        type='hidden'
+  if task.status
+    button.btn.badge.badge-primary.ml-1.mr-1()(
+      type='submit'
+      form=`myTaskStatus${task.status}`
+    ) !{task.status}
+      form(
+        action=route('tasks')
+        method='post'
+        id=`myTaskStatus${task.status}`
       )
+        input(
+          name='filter[taskStatus]'
+          value=task.status
+          type='hidden'
+        )
 
 mixin btnAssignedToFilter(task, users)
   button.h6.btn.btn-link.shadow-none.border-0.text-dark.my-0.py-0.ml-1.px-0(
