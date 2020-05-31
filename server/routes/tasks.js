@@ -261,7 +261,7 @@ export default (app) => {
           .execute();
       };
 
-      const deleteTag = async (app, tatId) => {
+      const deleteTag = async (app, tagId) => {
         const tag = await app.orm
           .getRepository(Tag).findOne({ id: tagId });
 
