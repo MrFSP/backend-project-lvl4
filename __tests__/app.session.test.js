@@ -27,9 +27,10 @@ const changedUser = {
 };
 
 const newTag = { name: 'Main' };
+const anotherTag = { name: 'anotherTag' };
+const tagForDeletiog = { name: 'tagForDeleting' };
 const newTaskStatus = { name: 'tests' };
 const anotherTaskStatus = {name: 'filtered status'};
-const tagForDeletiog = { name: 'tagForDeleting' };
 const taskStatusForDeleting = { name: 'taskStatusForDeleting' };
 
 const newTask = {
@@ -68,11 +69,11 @@ const getCookie = async (server, user) => {
   return res.header['set-cookie'];
 };
 
-const pathToFixtures = path.join(__dirname, '__fixtures__');
+// const pathToFixtures = path.join(__dirname, '__fixtures__');
 
 // let afterSignInPagehtml;
 // let changeTaskPagehtml;
-let filteredTaskPagehtml;
+// let filteredTaskPagehtml;
 
 describe('Testing changes in app', () => {
   let server;
@@ -80,7 +81,7 @@ describe('Testing changes in app', () => {
   beforeAll(async () => {
     // afterSignInPagehtml = await fs.readFile(path.join(pathToFixtures, 'after-sign-in-page.html'));
     // changeTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'change-task-page.html'));
-    filteredTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'filtered-task-page.html'));
+    // filteredTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'filtered-task-page.html'));
 
     expect.extend(matchers);
     server = app();
@@ -269,6 +270,48 @@ describe('Testing changes in app', () => {
     expect(tasks.length).toBe(1);
   });
 
+  it('Should create new task with array of tags', async () => {
+    await request.agent(server.server)
+      .post('/tasks/settings')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ newTag: anotherTag })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await request.agent(server.server)
+      .post('/tasks/new')
+      .set('cookie', await getCookie(server, currUser))
+      .send({
+        task: anotherNewTask,
+        tagsForTask: {
+          name: [newTag.name, anotherTag.name],
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const taskFromDB = await Task
+      .findOne({ where: { name: anotherNewTask.name } });
+
+    expect(taskFromDB.description).toEqual(anotherNewTask.description);
+    expect(taskFromDB.status).toEqual(anotherNewTask.status);
+
+    await request.agent(server.server)
+      .delete('/tasks')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ taskID: taskFromDB.id })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const taskFromDBAfterDeleting = await Task
+      .findOne({ where: { name: anotherNewTask.name } });
+
+    expect(taskFromDBAfterDeleting).toBe(undefined);
+  });
+
   it('Should get page /tasks/change', async () => {
     const task = await Task.findOne({ where: { name: newTask.name } });
 
@@ -333,7 +376,8 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
-    expect(res.text.toString()).toEqual(filteredTaskPagehtml.toString());
+    expect(res).toHaveHTTPStatus(200);
+    // expect(res.text.toString()).toEqual(filteredTaskPagehtml.toString());
   });
 
   it('Should not change password', async () => {
@@ -442,12 +486,12 @@ describe('Testing changes in app', () => {
     }
 
     await request.agent(server.server)
-    .post('/tasks/new')
-    .set('cookie', await getCookie(server, changedUser))
-    .send({ task: taskForDeleting })
-    .catch((err) => {
-      console.log(err);
-    });
+      .post('/tasks/new')
+      .set('cookie', await getCookie(server, changedUser))
+      .send({ task: taskForDeleting })
+      .catch((err) => {
+        console.log(err);
+      });
 
     const taskForDeletingFromDb = await Task.findOne({ where: { name: taskForDeleting.name } });
     const isTaskForDeletingExistsBeforeDelQuery = taskForDeletingFromDb ? true : false;

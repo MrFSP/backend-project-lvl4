@@ -103,6 +103,7 @@ export default (app) => {
     })
     .delete('/tasks', async (req, reply) => {
       const { taskID } = req.body;
+
       await app.orm
         .createQueryBuilder()
         .delete()
@@ -140,14 +141,10 @@ export default (app) => {
       newTask.creator = currentUserId;
 
       newTask.tags = await getTags(app, tagsForTask);
-      console.log('newTask.tagsnewTask.tags');
-      console.log(newTask.tags);
       await Task.save(newTask);
       return reply.redirect(app.reverse('tasks'));
     })
     .get('/tasks/change', { name: 'changeTask' }, async (req, reply) => {
-      console.log('reqreqreq');
-      console.log(req);
       const { taskId } = req.query;
       const users = await getUsers(app);
       const allTags = await app.orm.getRepository(Tag).find();
