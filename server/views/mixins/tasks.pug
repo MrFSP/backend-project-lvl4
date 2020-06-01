@@ -30,6 +30,11 @@ mixin list(items, type)
             value='delete'
           )
 
+mixin defaultlist(items)
+  each item in items
+    .d-flex.justify-content-center
+      a.nav-link.pl-4.text-dark !{item.name}
+
 mixin settingForm(properties, type)
   form(
     action=route('settings')

@@ -15,6 +15,8 @@ const currUser = {
   lastName: 'Pagac',
 };
 
+const defaultTaskStatus = { name: 'Новый' };
+
 const getCookie = async (server, user) => {
   const res = await request.agent(server.server)
     .post('/session')
@@ -191,6 +193,15 @@ describe('Testing responses for User', () => {
   });
 
   it('Should get page "/tasks/settings"', async () => {
+    // to act filtration default task statuses
+    await request.agent(server.server)
+      .post('/tasks/settings')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ newTaskStatus: defaultTaskStatus })
+      .catch((err) => {
+        console.log(err);
+    });
+
     const res = await request.agent(server.server)
       .get('/tasks/settings')
       .set('cookie', await getCookie(server, currUser))

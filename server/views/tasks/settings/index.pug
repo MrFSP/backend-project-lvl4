@@ -11,6 +11,7 @@ block content
     hr
     .text-center
       h5=t(`views.tasks.settings.newTaskStatus.name`)
+      +defaultlist(defaultTaskStatuses)
       +list(taskStatuses, 'taskStatusId')
     +settingForm(taskStatuses, 'newTaskStatus')
     hr

@@ -5,6 +5,7 @@ import User from '../entity/User.js';
 import Task from '../entity/Task.js';
 import TaskStatus from '../entity/TaskStatus.js';
 import Tag from '../entity/Tag.js';
+import defaultStatuses from '../locales/statuses.config';
 
 const getUsers = async (app) => {
   const usersFromDB = await app.orm
@@ -198,12 +199,23 @@ export default (app) => {
     })
     .get('/tasks/settings', { name: 'settings' }, async (req, reply) => {
       const tags = await app.orm.getRepository(Tag).find();
-      const taskStatuses = await app.orm.getRepository(TaskStatus).find();
+      const allTaskStatuses = await app.orm.getRepository(TaskStatus).find();
       const newTaskStatus = new TaskStatus();
       const newTag = new Tag();
+      const couldNotBeDeletedStatuses = [...defaultStatuses];
+      const defaultTaskStatuses = allTaskStatuses
+        .filter((status) => couldNotBeDeletedStatuses.includes(status.name));
+      const taskStatuses = allTaskStatuses
+        .filter((status) => !couldNotBeDeletedStatuses.includes(status.name));
       return reply.render(
           'tasks/settings/index',
-          { tags, taskStatuses, newTaskStatus, newTag },
+          {
+            tags,
+            taskStatuses,
+            newTaskStatus,
+            newTag,
+            defaultTaskStatuses,
+          },
         );
     })
     .post('/tasks/settings', async (req, reply) => {
@@ -228,30 +240,17 @@ export default (app) => {
         }
       };
 
-      console.log('reqreqreq');
-      console.log(newTag);
-      console.log(newTaskStatus);
       newTag ? await trySaveProp(newTag, 'tag') : null;
       newTaskStatus ? await trySaveProp(newTaskStatus, 'status') : null;
 
       return reply.redirect(app.reverse('settings'));
     })
     .delete('/tasks/settings', async (req, reply) => {
-      console.log('reqreqreq');
-      console.log(req);
-      console.log(req.body);
       const { tagId, taskStatusId } = req.body;
 
-      const deleteTaskStatus = async (app, taskStatusId) => {
+      const deleteTaskStatus = async (taskStatusId) => {
         const status = await app.orm
           .getRepository(TaskStatus).findOne({ id: taskStatusId });
-        const couldNotDeletedStatuses = [
-          'Новый', 'В работе', 'На тестировании', 'Завершён',
-        ];
-        if (couldNotDeletedStatuses.includes(status.name)) {
-          req.flash('error', i18next.t(`views.tasks.settings.newTaskStatus.exception`));
-          return;
-        }
         req.flash('info', i18next.t(`views.tasks.settings.newTaskStatus.success`));
         await app.orm
           .createQueryBuilder()
@@ -261,7 +260,7 @@ export default (app) => {
           .execute();
       };
 
-      const deleteTag = async (app, tagId) => {
+      const deleteTag = async (tagId) => {
         const tag = await app.orm
           .getRepository(Tag).findOne({ id: tagId });
 
@@ -274,8 +273,8 @@ export default (app) => {
           .execute();
       };
 
-      taskStatusId ? await deleteTaskStatus(app, taskStatusId) : null;
-      tagId ? await deleteTag(app, tagId) : null;
+      taskStatusId ? await deleteTaskStatus(taskStatusId) : null;
+      tagId ? await deleteTag(tagId) : null;
 
       return reply.redirect(app.reverse('settings'));
     });
