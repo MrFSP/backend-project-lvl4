@@ -33,8 +33,9 @@ export default (app) => {
         if (err.errno === 19) {
           req.flash('error', i18next.t('flash.users.create.emailExists'));
           return reply.redirect(app.reverse('newUser'));
+        } else {
+          throw err;
         }
-        throw err;
       }
     })
     .get('/users/new', { name: 'newUser' }, async (req, reply) => {

@@ -24,6 +24,7 @@ import getHelpers from './helpers/index.js';
 import User from './entity/User.js';
 import Guest from './entity/Guest.js';
 import Rollbar from 'rollbar';
+import urls from './configs/urlconfig'
 // import auth from './plugins/auth';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -74,17 +75,7 @@ const setupLocalization = (app) => {
 };
 
 const redirectGuests = (app, req, reply) => {
-  const condition1 = [
-    '/',
-    '/session',
-    '/session/new',
-    '/users/new',
-    '/assets/main.js',
-    '/assets/main.css',
-  ].includes(req.raw.originalUrl)
-  ? true
-  : false;
-
+  const condition1 = urls.includes(req.raw.originalUrl) ? true : false;
   const condition2 = req.raw.originalUrl === '/users' && req.raw.method === 'POST';
 
   if (condition1 || condition2) {

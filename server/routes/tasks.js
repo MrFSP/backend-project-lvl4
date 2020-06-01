@@ -5,7 +5,7 @@ import User from '../entity/User.js';
 import Task from '../entity/Task.js';
 import TaskStatus from '../entity/TaskStatus.js';
 import Tag from '../entity/Tag.js';
-import defaultStatuses from '../locales/statuses.config';
+import defaultStatuses from '../configs/statuses.config';
 
 const getUsers = async (app) => {
   const usersFromDB = await app.orm
