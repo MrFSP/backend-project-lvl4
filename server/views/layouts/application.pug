@@ -45,6 +45,12 @@ html(lang="en").h-100
           .animated.fadeOutUp
             .d-flex.justify-content-center.mt-2.mb-0.pb-0
               .row.col-md-auto.alert.text-center.w-auto.mb-0(class=`alert-${getAlertClass(type)}`)= message
+                button.close.pl-2.pr-0(
+                  type='button'
+                  data-dismiss='alert'
+                )
+                  span(aria-hidden='true') &times;
+                  span.sr-only Close
 
       h1.my-4.text-center
         block header
