@@ -1,13 +1,17 @@
 extends ../layouts/application.pug
 
 block content
-  table.table.table-striped
+  table.table.table-striped.table-bordered
     thead
       tr
-        th= t('users.id')
-        th= t('users.email')
+        th= t('id')
+        th= t('email')
+        th= t('first name')
+        th= t('last name')
     tbody
       each user in users
         tr
           td= user.id
           td= user.email
+          td= user.firstName
+          td= user.lastName
