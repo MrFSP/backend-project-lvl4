@@ -3,16 +3,17 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import _ from 'lodash';
 import matchers from 'jest-supertest-matchers';
+import faker from 'faker';
 
 import app from '../server';
 import User from '../server/entity/User';
 import encrypt from '../server/lib/secure.js';
 
 const currUser = {
-  email: 'MustafaJohns36@hotmail.com',
-  password: 'j1VFGV6z0PQVpQJ',
-  firstName: 'Ottilie',
-  lastName: 'Pagac',
+  email: faker.internet.email(),
+  password: faker.internet.password(),
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
 };
 
 const defaultTaskStatus = { name: 'Новый' };

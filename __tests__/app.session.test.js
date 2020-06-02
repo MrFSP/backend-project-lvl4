@@ -3,7 +3,7 @@ import matchers from 'jest-supertest-matchers';
 import { promises as fs } from 'fs';
 import path from 'path';
 import _ from 'lodash';
-// import faker from 'faker';
+import faker from 'faker';
 import User from '../server/entity/User';
 import Task from '../server/entity/Task';
 import TaskStatus from '../server/entity/TaskStatus';
@@ -13,10 +13,10 @@ import encrypt from '../server/lib/secure.js';
 import app from '../server';
 
 const currUser = {
-  email: 'MustafaJohns36@hotmail.com',
-  password: 'j1VFGV6z0PQVpQJ',
-  firstName: 'Ottilie',
-  lastName: 'Pagac',
+  email: faker.internet.email(),
+  password: faker.internet.password(),
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
 };
 
 const changedUser = {
@@ -26,17 +26,17 @@ const changedUser = {
   lastName: `changed${currUser.lastName}`,
 };
 
-const newTag = { name: 'Main' };
-const anotherTag = { name: 'anotherTag' };
-const tagForDeletiog = { name: 'tagForDeleting' };
-const newTaskStatus = { name: 'tests' };
-const anotherTaskStatus = {name: 'filtered status'};
-const taskStatusForDeleting = { name: 'taskStatusForDeleting' };
+const newTag = { name: faker.lorem.word() };
+const anotherTag = { name: faker.lorem.word() };
+const tagForDeletiog = { name: faker.lorem.word() };
+const newTaskStatus = { name: faker.lorem.word() };
+const anotherTaskStatus = {name: faker.lorem.word()};
+const taskStatusForDeleting = { name: faker.lorem.word() };
 
 const newTask = {
-  name: 'quaerat',
+  name: faker.lorem.word(),
   status: newTaskStatus.name,
-  description: 'Libero deleniti eum recusandae repudiandae cupiditate aut. Tenetur ea vel. Ad asperiores sequi ut ex qui aut rem aspernatur.',
+  description: faker.lorem.text(),
 };
 
 const newTaskWithEmptyName = {
@@ -54,9 +54,9 @@ const anotherNewTask = {
 };
 
 const changedNewTask = {
-  name: 'changedquaerat',
+  name: faker.lorem.word(),
   status: newTaskStatus.name,
-  description: 'Changed Libero deleniti eum recusandae repudiandae cupiditate aut. Tenetur ea vel. Ad asperiores sequi ut ex qui aut rem aspernatur.',
+  description: faker.lorem.text(),
 };
 
 const getCookie = async (server, user) => {
