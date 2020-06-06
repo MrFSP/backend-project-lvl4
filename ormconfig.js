@@ -1,3 +1,5 @@
+import { NamedModulesPlugin } from "webpack";
+
 const sqlite = {
   type: 'sqlite',
   database: `${__dirname}/__tests__/database.sqlite`,
@@ -20,7 +22,7 @@ const sqlite = {
   },
 };
 
-const postgre = {
+const postgres = {
    type: "postgres",
    host: "localhost",
    url: process.env.DATABASE_URL || '',
@@ -28,7 +30,7 @@ const postgre = {
    username: process.env.DB_USERNAME,
    password: process.env.DB_PASSWORD,
    database: process.env.DB_NAME,
-   synchronize: true,
+   synchronize: false,
    logging: true,
    entities: [
       `${__dirname}/server/entity/**/*.js`,
@@ -46,4 +48,4 @@ const postgre = {
   },
 }
 
-export default process.env.NODE_ENV !== 'test' ? postgre : sqlite;
+module.exports = process.env.NODE_ENV !== 'test' ? postgres : sqlite;
