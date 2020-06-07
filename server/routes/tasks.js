@@ -1,11 +1,13 @@
 // @ts-check
 
 import i18next from 'i18next';
+import { validate } from 'class-validator';
 import User from '../entity/User.js';
 import Task from '../entity/Task.js';
 import TaskStatus from '../entity/TaskStatus.js';
 import Tag from '../entity/Tag.js';
 import defaultStatuses from '../configs/statuses.config';
+import _ from 'lodash';
 
 const getUsers = async (app) => {
   const usersFromDB = await app.orm
@@ -127,10 +129,7 @@ export default (app) => {
     })
     .post('/tasks/new', async (req, reply) => {
       const { task, tagsForTask } = req.body;
-      if (!task.name) {
-        req.flash('info', i18next.t('flash.tasks.info.empty'));
-        return reply.redirect(app.reverse('newTask'));
-      }
+
       const currentUserId = req.session.get('userId');
 
       const newTask = new Task();
@@ -139,8 +138,19 @@ export default (app) => {
       newTask.description = task.description || '';
       newTask.assignedTo = task.assignedTo || '';
       newTask.creator = currentUserId;
-
       newTask.tags = await getTags(app, tagsForTask);
+
+      if (!newTask.name) {
+        req.flash('info', i18next.t('flash.tasks.info.empty'));
+        return reply.redirect(app.reverse('newTask'));
+      }
+
+      const errors = await validate(newTask);
+      if (!_.isEmpty(errors)) {
+        req.flash('error', i18next.t('flash.users.create.error'));
+        return reply.render('/users/new', { newTask, errors });
+      }
+
       await Task.save(newTask);
       return reply.redirect(app.reverse('tasks'));
     })

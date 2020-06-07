@@ -45,6 +45,12 @@ const newTaskWithEmptyName = {
   description: newTask.description,
 };
 
+const newTaskWithEmptyTaskStatus = {
+  name: faker.lorem.word(),
+  status: '',
+  description: newTask.description,
+};
+
 const anotherNewTask = {
   name: `another ${newTask.name}`,
   status: anotherTaskStatus.name,
@@ -258,6 +264,14 @@ describe('Testing changes in app', () => {
       .post('/tasks/new')
       .set('cookie', await getCookie(server, currUser))
       .send({ task: newTaskWithEmptyName, tagsForTask: newTag })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await request.agent(server.server)
+      .post('/tasks/new')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ task: newTaskWithEmptyTaskStatus, tagsForTask: newTag })
       .catch((err) => {
         console.log(err);
       });
