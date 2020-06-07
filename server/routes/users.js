@@ -60,12 +60,7 @@ export default (app) => {
         return reply.redirect(app.reverse('password'));
       }
       user.passwordDigest = encrypt(pass.newPass);
-      await app.orm
-        .createQueryBuilder()
-        .update(User)
-        .set(user)
-        .where("id = :id", { id: userId })
-        .execute();
+      await user.save();
       req.flash('info', i18next.t('flash.users.create.passwordChanged'));
       reply.redirect(app.reverse('user'));
       return;
@@ -85,27 +80,26 @@ export default (app) => {
     .post('/users/user', async (req, reply) => {
       const { user } = req.body;
       const userId = req.session.get('userId');
-      await app.orm
-        .createQueryBuilder()
-        .update(User)
-        .set(user)
-        .where("id = :id", { id: userId })
-        .execute();
+      const userFromDb = await app.orm
+        .getRepository(User)
+        .findOne(userId);
+      userFromDb.email = user.email;
+      userFromDb.firstName = user.firstName;
+      userFromDb.lastName = user.lastName;
+      await userFromDb.save();
       req.flash('info', i18next.t('views.user.accountUpdated'));
       reply.redirect(app.reverse('user'));
       return;
     })
     .delete('/users/user', async (req, reply) => {
       const userId = req.session.get('userId');
-      await app.orm
-        .createQueryBuilder()
-        .delete()
-        .from(User)
-        .where("id = :id", { id: userId })
-        .execute();
+      const user = await app.orm
+        .getRepository(User)
+        .findOne(userId);
+      await user.remove();
       req.session.delete();
-      reply.redirect(app.reverse('root'));
       req.flash('info', i18next.t('views.user.accountDeleted'));
+      reply.redirect(app.reverse('root'));
       return;
     });
 };
