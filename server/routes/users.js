@@ -24,19 +24,10 @@ export default (app) => {
         req.flash('error', i18next.t('flash.users.create.error'));
         return reply.render('/users/new', { user, errors });
       }
-      try {
-        await user.save();
-        req.flash('info', i18next.t('flash.users.create.success'));
-        return reply.redirect(app.reverse('newSession'));
-      }
-      catch(err) {
-        if (err.errno === 19) {
-          req.flash('error', i18next.t('flash.users.create.emailExists'));
-          return reply.redirect(app.reverse('newUser'));
-        } else {
-          throw err;
-        }
-      }
+
+      await user.save();
+      req.flash('info', i18next.t('flash.users.create.success'));
+      return reply.redirect(app.reverse('newSession'));
     })
     .get('/users/new', { name: 'newUser' }, async (req, reply) => {
       const user = new User();

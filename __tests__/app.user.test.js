@@ -16,6 +16,11 @@ const currUser = {
   lastName: faker.name.lastName(),
 };
 
+const wrongEmailUser = {
+  email: faker.lorem.word(),
+  password: faker.internet.password(),
+};
+
 const defaultTaskStatus = { name: 'Новый' };
 
 const getCookie = async (server, user) => {
@@ -90,7 +95,6 @@ describe('Testing responses for User', () => {
   it('User should be registered', async () => {
     await request.agent(server.server)
       .post('/users')
-      .set('Content-Type', 'application/json')
       .send({ user: currUser })
       .catch((err) => {
         console.log(err);
@@ -100,6 +104,19 @@ describe('Testing responses for User', () => {
 
     expect(userFromDb.email).toEqual(currUser.email);
     expect(userFromDb.passwordDigest).toEqual(encrypt(currUser.password));
+  });
+
+  it('User should not be registered', async () => {
+    await request.agent(server.server)
+      .post('/users')
+      .send({ user: wrongEmailUser })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const userFromDb = await User.findOne({ where: { email: wrongEmailUser.email } });
+
+    expect(userFromDb).toBe(undefined);
   });
 
   it('Should deny registration with exists email', async () => {
@@ -114,6 +131,8 @@ describe('Testing responses for User', () => {
 
     expect(usersFromDb.length).toEqual(1);
   });
+
+
 
   it('should return 404', async () => {
     const res = await request.agent(server.server)

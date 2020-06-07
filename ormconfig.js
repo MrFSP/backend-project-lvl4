@@ -48,4 +48,4 @@ const postgres = {
   },
 }
 
-module.exports = process.env.NODE_ENV !== 'test' ? postgres : sqlite;
+export default process.env.NODE_ENV !== 'test' ? postgres : sqlite;
