@@ -183,25 +183,17 @@ export default (app) => {
         req.flash('info', i18next.t('flash.tasks.info.empty'));
         return reply.redirect(app.reverse('newTask'));
       }
-      const currentUserId = req.session.get('userId');
       
       const taskForChange = await app.orm.getRepository(Task).findOne({ id: oldTask.id });
       taskForChange.tags = taskForChange.tags.filter((tag) => tag === false);
       taskForChange.tags = await getTags(app, tagsForTask);
+      taskForChange.name = task.name;
+      taskForChange.description = task.description;
+      taskForChange.status = task.status;
+      taskForChange.assignedTo = task.assignedTo;
+      taskForChange.creator = task.creator;
       await taskForChange.save();
 
-      await app.orm
-        .createQueryBuilder()
-        .update(Task)
-        .set({
-          name: task.name,
-          description: task.description || '',
-          status: task.status,
-          assignedTo: task.assignedTo || '',
-          creator: currentUserId,
-        })
-        .where("id = :id", { id: oldTask.id })
-        .execute();
       return reply.redirect(app.reverse('tasks'));
     })
     .get('/tasks/settings', { name: 'settings' }, async (req, reply) => {
@@ -255,33 +247,15 @@ export default (app) => {
     .delete('/tasks/settings', async (req, reply) => {
       const { tagId, taskStatusId } = req.body;
 
-      const deleteTaskStatus = async (taskStatusId) => {
-        const status = await app.orm
-          .getRepository(TaskStatus).findOne({ id: taskStatusId });
+      if (taskStatusId) {
+        await app.orm.getRepository(TaskStatus).remove({ id: taskStatusId });
         req.flash('info', i18next.t(`views.tasks.settings.newTaskStatus.success`));
-        await app.orm
-          .createQueryBuilder()
-          .delete()
-          .from(TaskStatus)
-          .where("id = :id", { id: status.id })
-          .execute();
-      };
+      }
 
-      const deleteTag = async (tagId) => {
-        const tag = await app.orm
-          .getRepository(Tag).findOne({ id: tagId });
-
+      if (tagId) {
+        await app.orm.getRepository(Tag).remove({ id: tagId });
         req.flash('info', i18next.t(`views.tasks.settings.newTag.success`));
-        await app.orm
-          .createQueryBuilder()
-          .delete()
-          .from(Tag)
-          .where("id = :id", { id: tag.id })
-          .execute();
-      };
-
-      taskStatusId ? await deleteTaskStatus(taskStatusId) : null;
-      tagId ? await deleteTag(tagId) : null;
+      }
 
       return reply.redirect(app.reverse('settings'));
     });
