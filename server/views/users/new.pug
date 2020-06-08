@@ -4,7 +4,8 @@ block header
   = t('views.users.new.signUp')
 
 block content
-  +formFor()(action=route('users') method='post')
-    +input(user, 'email', errors)(type="text")
-    +input(user, 'password', errors)(type="password")
-    +submit(user)(value=t('views.users.new.submit'))
+  .container.col-4.justify-content-center
+    +formFor()(action=route('users') method='post')
+      +input(user, 'email', errors)(type="text")
+      +input(user, 'password', errors)(type="password")
+      +submit.mt-4(user)(value=t('views.users.new.submit'))

@@ -45,7 +45,7 @@
       "babel-eslint": "^10.1.0",
       "babel-jest": "^26.0.1",
       "babel-loader": "^8.1.0",
-      "bootstrap": "^4.4.1",
+      "bootstrap": "^4.5.0",
       "bootstrap-sass": "^3.4.1",
       "class-validator": "^0.12.2",
       "css-loader": "^3.5.3",
