@@ -213,7 +213,6 @@ describe('Testing responses for User', () => {
   });
 
   it('Should get page "/tasks/settings"', async () => {
-    // to act filtration default task statuses
     await request.agent(server.server)
       .post('/tasks/settings')
       .set('cookie', await getCookie(server, currUser))
@@ -261,7 +260,7 @@ describe('Testing responses for User', () => {
     const isCurrUserExistsBeforeDelQuery = currUserFromDb ? true : false;
 
     await request.agent(server.server)
-      .delete('/users/user')
+      .delete(`/users/user/${currUserFromDb.id}`)
       .set('cookie', await getCookie(server, currUser))
       .catch((err) => {
         console.log(err);

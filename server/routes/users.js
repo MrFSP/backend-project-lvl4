@@ -93,16 +93,14 @@ export default (app) => {
       return;
     })
     .delete('/users/user/:userId', async (req, reply) => {
-      console.log('printprint');
-      console.log(req);
-      // const userId = req.params['*'].replace(/^(.*[\/])/, '');
-      // const user = await app.orm
-      //   .getRepository(User)
-      //   .findOne(userId);
-      // await user.remove();
-      // req.session.delete();
-      // req.flash('info', i18next.t('views.user.accountDeleted'));
-      // reply.redirect(app.reverse('root'));
-      // return;
+      const { userId } = req.params;
+      const user = await app.orm
+        .getRepository(User)
+        .findOne(userId);
+      await user.remove();
+      req.session.delete();
+      req.flash('info', i18next.t('views.user.accountDeleted'));
+      reply.redirect(app.reverse('root'));
+      return;
     });
 };
