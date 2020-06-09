@@ -78,6 +78,7 @@ export default (app) => {
       return reply.render('users/user', { user, keys });
     })
     .post('/users/user', async (req, reply) => {
+      console.log('postpostpost');
       const { user } = req.body;
       const userId = req.session.get('userId');
       const userFromDb = await app.orm
@@ -91,15 +92,17 @@ export default (app) => {
       reply.redirect(app.reverse('user'));
       return;
     })
-    .delete('/users/user', async (req, reply) => {
-      const userId = req.session.get('userId');
-      const user = await app.orm
-        .getRepository(User)
-        .findOne(userId);
-      await user.remove();
-      req.session.delete();
-      req.flash('info', i18next.t('views.user.accountDeleted'));
-      reply.redirect(app.reverse('root'));
-      return;
+    .delete('/users/user/:userId', async (req, reply) => {
+      console.log('printprint');
+      console.log(req);
+      // const userId = req.params['*'].replace(/^(.*[\/])/, '');
+      // const user = await app.orm
+      //   .getRepository(User)
+      //   .findOne(userId);
+      // await user.remove();
+      // req.session.delete();
+      // req.flash('info', i18next.t('views.user.accountDeleted'));
+      // reply.redirect(app.reverse('root'));
+      // return;
     });
 };
