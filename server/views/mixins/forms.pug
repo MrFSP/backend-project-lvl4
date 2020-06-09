@@ -7,6 +7,7 @@ mixin formFor(entity = null)
 mixin input(entity, propertyName, errors = [])
   - error = errors.find((error) => error.property === propertyName)
   .form-label-group(class=(errors[propertyName] && 'has-danger'))
+    label.mt-2(for=propertyName)= propertyName
     input(
       name=getInputName(entity, propertyName)
       class='form-control'
@@ -16,7 +17,6 @@ mixin input(entity, propertyName, errors = [])
       required=''
       autofocus=''
     )&attributes(attributes)
-    label(for=propertyName)= propertyName
     if error
       .form-control-feedback= Object.values(error.constraints).join('. ')
 
@@ -112,11 +112,22 @@ mixin buttonDeleteUser()
             h5#deleteUserLabel.modal-title.text-center= t('views.user.delete.deleteTitle')
         .modal-body= t('views.user.delete.deleteMessage')
         .modal-footer.justify-content-between
-          button.btn.btn-primary(type='button' data-dismiss='modal')= t('views.user.delete.save')
-          +buttonTo(route('user'), 'delete')(
-                          class="btn btn-danger"
-                          value=t('views.user.delete.confirmDelete')
-                        )
+          button.btn.btn-primary(
+            type='button'
+            data-dismiss='modal'
+          )= t('views.user.delete.save')
+          form(
+            action=`${route('user')}/${user.id}`
+            method='post'
+          )
+            input(
+              name="_method"
+              type="hidden"
+              value='DELETE'
+            )
+            button.btn.btn-danger(
+              type='submit'
+            )=t('views.user.delete.confirmDelete')
 
 mixin changeProp(route, properties, nameOfNewProp)
   form#settings(action=route(route) method='post')

@@ -78,6 +78,7 @@ export default (app) => {
       return reply.render('users/user', { user, keys });
     })
     .post('/users/user', async (req, reply) => {
+      console.log('postpostpost');
       const { user } = req.body;
       const userId = req.session.get('userId');
       const userFromDb = await app.orm
@@ -91,8 +92,8 @@ export default (app) => {
       reply.redirect(app.reverse('user'));
       return;
     })
-    .delete('/users/user', async (req, reply) => {
-      const userId = req.session.get('userId');
+    .delete('/users/user/:userId', async (req, reply) => {
+      const { userId } = req.params;
       const user = await app.orm
         .getRepository(User)
         .findOne(userId);
