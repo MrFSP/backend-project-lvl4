@@ -313,9 +313,8 @@ describe('Testing changes in app', () => {
     expect(taskFromDB.status).toEqual(anotherNewTask.status);
 
     await request.agent(server.server)
-      .delete('/tasks')
+      .delete(`/tasks/${taskFromDB.id}`)
       .set('cookie', await getCookie(server, currUser))
-      .send({ taskID: taskFromDB.id })
       .catch((err) => {
         console.log(err);
       });
@@ -508,18 +507,21 @@ describe('Testing changes in app', () => {
       });
 
     const taskForDeletingFromDb = await Task.findOne({ where: { name: taskForDeleting.name } });
-    const isTaskForDeletingExistsBeforeDelQuery = taskForDeletingFromDb ? true : false;
+    const isTaskForDeletingExistsBeforeDelQuery = taskForDeletingFromDb
+      ? true
+      : false;
 
     await request.agent(server.server)
-      .delete('/tasks')
+      .delete(`/tasks/${taskForDeletingFromDb.id}`)
       .set('cookie', await getCookie(server, changedUser))
-      .send({ taskID: taskForDeletingFromDb.id })
       .catch((err) => {
         console.log(err);
       });
 
     const taskForDeletingFromDbAfterQuery = await Task.findOne({ where: { name: taskForDeleting.name } })
-    const isTaskForDeletingExistsAfterQuery = taskForDeletingFromDbAfterQuery ? true : false;
+    const isTaskForDeletingExistsAfterQuery = taskForDeletingFromDbAfterQuery 
+      ? true
+      : false;
 
     expect(isTaskForDeletingExistsBeforeDelQuery).toBe(true);
     expect(isTaskForDeletingExistsAfterQuery).toBe(false);

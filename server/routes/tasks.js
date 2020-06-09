@@ -103,15 +103,12 @@ export default (app) => {
 
       return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })
-    .delete('/tasks', async (req, reply) => {
-      const { taskID } = req.body;
-
-      await app.orm
-        .createQueryBuilder()
-        .delete()
-        .from(Task)
-        .where("id = :id", { id: taskID })
-        .execute();
+    .delete('/tasks/:taskId', async (req, reply) => {
+      const { taskId } = req.params;
+      const task = await app.orm
+        .getRepository(Task)
+        .findOne(taskId);
+      await task.remove();
       return reply.redirect(app.reverse('tasks'));
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
