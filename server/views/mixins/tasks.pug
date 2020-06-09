@@ -15,15 +15,10 @@ mixin list(items, type)
           onclick="return confirm('Вы уверены?')"
         )= t('views.tasks.tasks.delete')
         form(
-          action=route('settings')
+          action=`${route('settings')}/${type}/${item.id}`
           method='post'
           id=`formForDeleteItem${item.name}`
         )
-          input(
-            name=type
-            value=item.id
-            type='hidden'
-          )
           input(
             name="_method"
             type="hidden"
@@ -98,7 +93,7 @@ mixin selectTaskStatus(taskStatus)
 
 mixin selectedTags(tags)
   each tag in tags
-    .form-check
+    .form-check.ml-2
       input.form-check-input(
         type='checkbox'
         id=`${tag.name}`
@@ -246,26 +241,19 @@ mixin taskCard(task)
                       value=task.id
                       type='hidden'
                     )
-                  button.btn.btn-link.btn-sm.shadow-none.border-0.text-danger(
-                    type='submit'
-                    form=`formForDeleteTask${task.id}`
-                    onclick="return confirm('Вы уверены что хотите удалить задачу?')"
-                  )= t('views.tasks.tasks.delete')
                   form(
-                    action=route('tasks')
+                    action=`${route('tasks')}/${task.id}`
                     method='post'
-                    id=`formForDeleteTask${task.id}`
                   )
-                    input(
-                      name='taskID'
-                      value=task.id
-                      type='hidden'
-                    )
                     input(
                       name="_method"
                       type="hidden"
                       value='delete'
                     )
+                    button.btn.btn-link.btn-sm.shadow-none.border-0.text-danger(
+                      type='submit'
+                      onclick="return confirm('Вы уверены что хотите удалить задачу?')"
+                    )= t('views.tasks.tasks.delete')
             .collapse(
               aria-labelledby=`heading${task.id}`
               data-parent=`#accordion${task.id}`

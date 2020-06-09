@@ -103,15 +103,12 @@ export default (app) => {
 
       return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })
-    .delete('/tasks', async (req, reply) => {
-      const { taskID } = req.body;
-
-      await app.orm
-        .createQueryBuilder()
-        .delete()
-        .from(Task)
-        .where("id = :id", { id: taskID })
-        .execute();
+    .delete('/tasks/:taskId', async (req, reply) => {
+      const { taskId } = req.params;
+      const task = await app.orm
+        .getRepository(Task)
+        .findOne(taskId);
+      await task.remove();
       return reply.redirect(app.reverse('tasks'));
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
@@ -244,8 +241,11 @@ export default (app) => {
 
       return reply.redirect(app.reverse('settings'));
     })
-    .delete('/tasks/settings', async (req, reply) => {
-      const { tagId, taskStatusId } = req.body;
+    .delete('/tasks/settings/:type/:id', async (req, reply) => {
+      const { type, id } = req.params;
+
+      const tagId = type === 'tagId' ? id : null;
+      const taskStatusId = type === 'taskStatusId' ? id : null;
 
       if (taskStatusId) {
         await app.orm.getRepository(TaskStatus).remove({ id: taskStatusId });

@@ -170,9 +170,8 @@ describe('Testing changes in app', () => {
     expect(tagBeforeDeleting.name).toEqual(tagForDeletiog.name);
 
     await request.agent(server.server)
-      .delete('/tasks/settings')
+      .delete(`/tasks/settings/tagId/${tagBeforeDeleting.id}`)
       .set('cookie', await getCookie(server, currUser))
-      .send({ tagId: tagBeforeDeleting.id })
       .catch((err) => {
         console.log(err);
       });
@@ -235,7 +234,7 @@ describe('Testing changes in app', () => {
     expect(statusBeforeDeleting.name).toEqual(taskStatusForDeleting.name);
 
     await request.agent(server.server)
-      .delete('/tasks/settings')
+      .delete(`/tasks/settings/taskStatusId/${statusBeforeDeleting.id}`)
       .set('cookie', await getCookie(server, currUser))
       .send({ taskStatusId: statusBeforeDeleting.id })
       .catch((err) => {
@@ -313,9 +312,8 @@ describe('Testing changes in app', () => {
     expect(taskFromDB.status).toEqual(anotherNewTask.status);
 
     await request.agent(server.server)
-      .delete('/tasks')
+      .delete(`/tasks/${taskFromDB.id}`)
       .set('cookie', await getCookie(server, currUser))
-      .send({ taskID: taskFromDB.id })
       .catch((err) => {
         console.log(err);
       });
@@ -508,18 +506,21 @@ describe('Testing changes in app', () => {
       });
 
     const taskForDeletingFromDb = await Task.findOne({ where: { name: taskForDeleting.name } });
-    const isTaskForDeletingExistsBeforeDelQuery = taskForDeletingFromDb ? true : false;
+    const isTaskForDeletingExistsBeforeDelQuery = taskForDeletingFromDb
+      ? true
+      : false;
 
     await request.agent(server.server)
-      .delete('/tasks')
+      .delete(`/tasks/${taskForDeletingFromDb.id}`)
       .set('cookie', await getCookie(server, changedUser))
-      .send({ taskID: taskForDeletingFromDb.id })
       .catch((err) => {
         console.log(err);
       });
 
     const taskForDeletingFromDbAfterQuery = await Task.findOne({ where: { name: taskForDeleting.name } })
-    const isTaskForDeletingExistsAfterQuery = taskForDeletingFromDbAfterQuery ? true : false;
+    const isTaskForDeletingExistsAfterQuery = taskForDeletingFromDbAfterQuery 
+      ? true
+      : false;
 
     expect(isTaskForDeletingExistsBeforeDelQuery).toBe(true);
     expect(isTaskForDeletingExistsAfterQuery).toBe(false);
