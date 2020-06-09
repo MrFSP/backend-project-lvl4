@@ -241,8 +241,11 @@ export default (app) => {
 
       return reply.redirect(app.reverse('settings'));
     })
-    .delete('/tasks/settings', async (req, reply) => {
-      const { tagId, taskStatusId } = req.body;
+    .delete('/tasks/settings/:type/:id', async (req, reply) => {
+      const { type, id } = req.params;
+
+      const tagId = type === 'tagId' ? id : null;
+      const taskStatusId = type === 'taskStatusId' ? id : null;
 
       if (taskStatusId) {
         await app.orm.getRepository(TaskStatus).remove({ id: taskStatusId });

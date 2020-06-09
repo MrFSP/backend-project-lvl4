@@ -15,15 +15,10 @@ mixin list(items, type)
           onclick="return confirm('Вы уверены?')"
         )= t('views.tasks.tasks.delete')
         form(
-          action=route('settings')
+          action=`${route('settings')}/${type}/${item.id}`
           method='post'
           id=`formForDeleteItem${item.name}`
         )
-          input(
-            name=type
-            value=item.id
-            type='hidden'
-          )
           input(
             name="_method"
             type="hidden"
@@ -98,7 +93,7 @@ mixin selectTaskStatus(taskStatus)
 
 mixin selectedTags(tags)
   each tag in tags
-    .form-check
+    .form-check.ml-2
       input.form-check-input(
         type='checkbox'
         id=`${tag.name}`

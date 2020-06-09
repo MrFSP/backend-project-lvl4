@@ -170,9 +170,8 @@ describe('Testing changes in app', () => {
     expect(tagBeforeDeleting.name).toEqual(tagForDeletiog.name);
 
     await request.agent(server.server)
-      .delete('/tasks/settings')
+      .delete(`/tasks/settings/tagId/${tagBeforeDeleting.id}`)
       .set('cookie', await getCookie(server, currUser))
-      .send({ tagId: tagBeforeDeleting.id })
       .catch((err) => {
         console.log(err);
       });
@@ -235,7 +234,7 @@ describe('Testing changes in app', () => {
     expect(statusBeforeDeleting.name).toEqual(taskStatusForDeleting.name);
 
     await request.agent(server.server)
-      .delete('/tasks/settings')
+      .delete(`/tasks/settings/taskStatusId/${statusBeforeDeleting.id}`)
       .set('cookie', await getCookie(server, currUser))
       .send({ taskStatusId: statusBeforeDeleting.id })
       .catch((err) => {
