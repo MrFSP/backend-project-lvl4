@@ -116,12 +116,10 @@ export default (app) => {
       const tags = await app.orm.getRepository(Tag).find();
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
       const task = new Task();
-      const taskStatus = new TaskStatus();
-      const tag = new Tag();
 
       return reply.render(
         'tasks/new',
-         { users, tags, taskStatuses, task, taskStatus, tag },
+         { users, tags, taskStatuses, task },
         );
     })
     .post('/tasks/new', async (req, reply) => {
@@ -136,11 +134,6 @@ export default (app) => {
       newTask.assignedTo = task.assignedTo || '';
       newTask.creator = currentUserId;
       newTask.tags = await getTags(app, tagsForTask);
-
-      if (!newTask.name) {
-        req.flash('info', i18next.t('flash.tasks.info.empty'));
-        return reply.redirect(app.reverse('newTask'));
-      }
 
       const errors = await validate(newTask);
       if (!_.isEmpty(errors)) {
@@ -249,7 +242,10 @@ export default (app) => {
 
       if (taskStatusId) {
         await app.orm.getRepository(TaskStatus).remove({ id: taskStatusId });
-        req.flash('info', i18next.t(`views.tasks.settings.newTaskStatus.success`));
+        req.flash(
+          'info',
+          i18next.t(`views.tasks.settings.newTaskStatus.success`)
+        );
       }
 
       if (tagId) {

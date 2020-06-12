@@ -62,8 +62,7 @@ export default (app) => {
       user.passwordDigest = encrypt(pass.newPass);
       await user.save();
       req.flash('info', i18next.t('flash.users.create.passwordChanged'));
-      reply.redirect(app.reverse('user'));
-      return;
+      return reply.redirect(app.reverse('user'));
     })
     .get('/users/user', { name: 'user' }, async (req, reply) => {
       const userId = req.session.get('userId');
@@ -89,8 +88,7 @@ export default (app) => {
       userFromDb.lastName = user.lastName;
       await userFromDb.save();
       req.flash('info', i18next.t('views.user.accountUpdated'));
-      reply.redirect(app.reverse('user'));
-      return;
+      return reply.redirect(app.reverse('user'));
     })
     .delete('/users/user/:userId', async (req, reply) => {
       const { userId } = req.params;
@@ -100,7 +98,6 @@ export default (app) => {
       await user.remove();
       req.session.delete();
       req.flash('info', i18next.t('views.user.accountDeleted'));
-      reply.redirect(app.reverse('root'));
-      return;
+      return reply.redirect(app.reverse('root'));
     });
 };
