@@ -52,7 +52,7 @@ mixin settingForm(properties, type)
 //- mixins for
 
 mixin oldtask(task)
-  input#FormControlInput1.form-control.data-bv-notempty-message(
+  input#FormControlInput.form-control.data-bv-notempty-message(
     name='oldTask'
     value=task
     type='hidden'
@@ -61,9 +61,9 @@ mixin oldtask(task)
 mixin inputTaskName(taskName = '')
   .form-group
     label(
-      for='FormControlInput1'
+      for='FormControlInputTaskName'
     )= t('views.tasks.change.taskName')
-    input#FormControlInput1.form-control.data-bv-notempty-message(
+    input#FormControlInputTaskName.form-control.data-bv-notempty-message(
       name='task[name]'
       autocomplete='off'
       value=`${taskName || ''}`
@@ -105,28 +105,37 @@ mixin selectedTags(tags)
         for=`${tag.name}`
       )= t(`${tag.name}`)
 
-mixin selectTags(taskTags)
-  .form-group.col.mb-2.pl-0
-    label.mb-1= t('views.tasks.settings.tags')
-    .row.ml-0
-      if taskTags
-        +selectedTags(taskTags)
-      each tag in tags
-        .form-check.ml-2
-          input.form-check-input.pt-1(
-            type='checkbox'
-            id=`${tag.name}`
-            name='tagsForTask[name]'
-            value=tag.name
-          )
-          label.form-check-label(
-            for=`${tag.name}`
-          )= t(`${tag.name}`)
-      if !taskTags
-        a.h6.btn-link.ml-4.mt-1.mb-1(
-          href=route('settings'),
-          method='get',
-        )= t('views.tasks.settings.add')
+mixin btnTagDelete(tag)
+  button.btn.badge.badge-pill.badge-success.ml-1.mr-1.my-2(
+    type='submit'
+    form=`myTaskTag${tag.name}`
+  ) !{tag.name}
+    form(
+      action=route('tasks')
+      method='post'
+      id=`myTaskTag${tag.name}`
+    )
+      input(
+        name='filter[tag]'
+        value=tag.id
+        type='hidden'
+      )
+
+mixin inputTags(taskTags)
+  .form-group
+    .row.justify-content-between.mx-0
+      label.mt-1(
+        for='FormControlInputTags'
+      )= t('views.tasks.settings.tags')
+      .row.mx-0
+        if task
+          each tag in task.tags
+            +btnTagDelete(tag)
+    input#FormControlInputTags.form-control.data-bv-notempty-message(
+      name='newTags'
+      autocomplete='off'
+      placeholder= t('views.tasks.new.tag')
+    )
 
 mixin selectAssignedTo(assignedTo)
   .form-group
@@ -280,7 +289,7 @@ mixin filterByUser(users)
 
 mixin filterByTaskStatus(taskStatuses)
   .form-group.col-md-4.mb-2
-    select.form-control(name='filter[taskStatus]')
+    select.form-control(name='filter[status]')
       option.form-control(
         selected=''
         disabled=''
