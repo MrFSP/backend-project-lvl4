@@ -26,7 +26,7 @@ const changedUser = {
   lastName: `changed${currUser.lastName}`,
 };
 
-const newTag = { name: faker.lorem.word() };
+const newTag = faker.lorem.word();
 const anotherTag = { name: faker.lorem.word() };
 const tagForDeletiog = { name: faker.lorem.word() };
 const newTaskStatus = { name: faker.lorem.word() };
@@ -251,10 +251,10 @@ describe('Testing changes in app', () => {
 
   it('Should create new task', async () => {
 
-    await request.agent(server.server)
+    const res = await request.agent(server.server)
       .post('/tasks/new')
       .set('cookie', await getCookie(server, currUser))
-      .send({ task: newTask, tagsForTask: newTag })
+      .send({ task: newTask, newTags: newTag })
       .catch((err) => {
         console.log(err);
       });
