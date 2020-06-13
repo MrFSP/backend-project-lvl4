@@ -5,7 +5,7 @@ block content
   .container.col-6.justify-content-center
     h3.mb-3.font-weight-normal.text-center= t('views.tasks.new.title')
     form#task(
-      action=route('newTask')
+      action=route('tasks')
       method='post'
     )
       +inputTaskName()

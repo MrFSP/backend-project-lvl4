@@ -52,11 +52,9 @@ export const filterTasks = (tasks, filter) => {
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks' }, async (req, reply) => {
-      const tasks = await app.orm
-        .getRepository(Task)
-        .createQueryBuilder("task")
-        .leftJoinAndSelect("task.tags", "tag")
-        .getMany();
+      const filter = { ...req.query };
+      console.log(_.isEmpty(filter));
+      const tasks = await app.orm.getRepository(Task).find(filter);
 
       const users = await getUsers(app);
 
@@ -65,30 +63,7 @@ export default (app) => {
 
       return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })
-    .post('/tasks', async (req, reply) => {
-      const { filter } = req.body;
-      console.log('filterfilter');
-      console.log(filter);
-      const tasks = await app.orm.getRepository(Task).find({ ...filter });
-
-      // const tasks = filterTasks(allTasks, filter);
-
-      const users = await getUsers(app);
-
-      const taskStatuses = await app.orm.getRepository(TaskStatus).find();
-      const tags = await app.orm.getRepository(Tag).find();
-
-      return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
-    })
-    .delete('/tasks/:taskId', async (req, reply) => {
-      const { taskId } = req.params;
-      const task = await app.orm
-        .getRepository(Task)
-        .findOne(taskId);
-      await task.remove();
-      return reply.redirect(app.reverse('tasks'));
-    })
-    .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
+    .get('/tasks/new', async (req, reply) => {
       const users = await getUsers(app);
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
 
@@ -97,7 +72,7 @@ export default (app) => {
          { users, taskStatuses },
         );
     })
-    .post('/tasks/new', async (req, reply) => {
+    .post('/tasks', async (req, reply) => {
       const { task, newTags } = req.body;
 
       const newTagsNames = newTags
@@ -140,8 +115,10 @@ export default (app) => {
 
       const errors = await validate(newTask);
       if (!_.isEmpty(errors)) {
-        req.flash('error', i18next.t('flash.users.create.error'));
-        return reply.render('/users/new', { newTask, errors });
+        req.flash('error', i18next.t('flash.tasks.create.error'));
+        const users = await getUsers(app);
+        const taskStatuses = await app.orm.getRepository(TaskStatus).find();
+        return reply.render('/tasks/new', { users, taskStatuses, errors });
       }
 
       console.log('newTasknewTask');
@@ -150,8 +127,10 @@ export default (app) => {
       await Task.save(newTask);
       return reply.redirect(app.reverse('tasks'));
     })
-    .get('/tasks/change', { name: 'changeTask' }, async (req, reply) => {
-      const { taskId } = req.query;
+    .get('/tasks/:taskId/edit', async (req, reply) => {
+      console.log('QWEQWEQWE');
+      console.log(req);
+      const { taskId } = req.params;
       const users = await getUsers(app);
       const allTags = await app.orm.getRepository(Tag).find();
       const allTaskStatuses = await app.orm.getRepository(TaskStatus).find();
@@ -170,7 +149,7 @@ export default (app) => {
          { users, tags, taskStatuses, task},
         );
     })
-    .post('/tasks/change', async (req, reply) => {
+    .patch('/tasks/:taskId/edit', async (req, reply) => {
       const { task, tagsForTask } = req.body;
 
       const oldTask = JSON.parse(req.body.oldTask);
@@ -190,6 +169,14 @@ export default (app) => {
       taskForChange.creator = task.creator;
       await taskForChange.save();
 
+      return reply.redirect(app.reverse('tasks'));
+    })
+    .delete('/tasks/:taskId', async (req, reply) => {
+      const { taskId } = req.params;
+      const task = await app.orm
+        .getRepository(Task)
+        .findOne(taskId);
+      await task.remove();
       return reply.redirect(app.reverse('tasks'));
     })
     .get('/tasks/settings', { name: 'settings' }, async (req, reply) => {

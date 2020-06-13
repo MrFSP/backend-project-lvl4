@@ -168,12 +168,12 @@ mixin btnTag(tag)
   ) !{tag.name}
     form(
       action=route('tasks')
-      method='post'
+      method='get'
       id=`myTaskTag${tag.name}`
     )
       input(
-        name='filter[tag]'
-        value=tag.id
+        name='tags'
+        value=tag
         type='hidden'
       )
 
@@ -185,11 +185,11 @@ mixin btnTaskStatus(task)
     ) !{task.status}
       form(
         action=route('tasks')
-        method='post'
+        method='get'
         id=`myTaskStatus${task.status}`
       )
         input(
-          name='filter[taskStatus]'
+          name='status'
           value=task.status
           type='hidden'
         )
@@ -201,11 +201,11 @@ mixin btnAssignedToFilter(task, users)
   ) !{users[task.assignedTo] ? users[task.assignedTo].fullName : ''}
     form(
       action=route('tasks')
-      method='post'
+      method='get'
       id=`myTaskAssignedTo${task.assignedTo}`
     )
       input(
-        name='filter[assignedTo]'
+        name='assignedTo'
         value=task.assignedTo
         type='hidden'
       )
@@ -236,20 +236,19 @@ mixin taskCard(task)
                     each tag in task.tags
                       +btnTag(tag)
                 .col
-                  button.btn.btn-link.btn-sm.shadow-none.border-0.text-primary.mt-1(
-                    type='submit'
-                    form=`formForTaskChange${task.id}`
+                  a.btn.btn-link.btn-sm.shadow-none.border-0.text-primary.mt-1(
+                    href=`${route('tasks')}/${task.id}/edit`
                   )= t('views.tasks.tasks.change')
-                  form(
-                    action=route('changeTask')
-                    method='get'
-                    id=`formForTaskChange${task.id}`
-                  )
-                    input(
-                      name='taskId'
-                      value=task.id
-                      type='hidden'
-                    )
+                  //- form(
+                  //-   action=`${route('tasks')}/${task.id}/edit`
+                  //-   method='get'
+                  //-   id=`formForTaskChange${task.id}`
+                  //- )
+                  //-   input(
+                  //-     name='taskId'
+                  //-     value=task.id
+                  //-     type='hidden'
+                  //-   )
                   form(
                     action=`${route('tasks')}/${task.id}`
                     method='post'
@@ -276,7 +275,7 @@ mixin taskCard(task)
 
 mixin filterByUser(users)
   .form-group.col-md-4.mb-2
-    select.form-control(name='filter[assignedTo]')
+    select.form-control(name='assignedTo')
       option.form-control(
         selected=''
         disabled=''
@@ -287,9 +286,10 @@ mixin filterByUser(users)
           value=user.id
         )= t(`${user.fullName}`)
 
+
 mixin filterByTaskStatus(taskStatuses)
   .form-group.col-md-4.mb-2
-    select.form-control(name='filter[status]')
+    select.form-control(name='status')
       option.form-control(
         selected=''
         disabled=''
@@ -302,7 +302,7 @@ mixin filterByTaskStatus(taskStatuses)
 
 mixin filterByTag(tags)
   .form-group.col-md-4.mb-2
-    select.form-control(name='filter[tag]')
+    select.form-control(name='tags')
       option.form-control(
         selected=''
         disabled=''

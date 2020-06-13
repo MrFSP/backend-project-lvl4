@@ -5,8 +5,8 @@ block content
   .container.col-6.justify-content-center
     h3.mb-3.font-weight-normal.text-center= t('views.tasks.change.title')
     form#task(
-      action=route('changeTask')
-      method='post'
+      action=`${route('tasks')}/${task.id}/edit`
+      method='patch'
     )
       +oldtask(task)
       +inputTaskName(task.name)
