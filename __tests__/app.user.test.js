@@ -166,9 +166,10 @@ describe('Testing responses for User', () => {
     expect(res).toHaveHTTPStatus(200);
   });
 
-  it('Should return page "/users/user"', async () => {
+  it('Should return page "/users/:id"', async () => {
+    const userFromDb = await User.findOne({ where: { email: currUser.email } });
     const res = await request.agent(server.server)
-      .get('/users/user')
+      .get(`/users/${userFromDb.id}`)
       .set('cookie', await getCookie(server, currUser))
       .catch((err) => {
         console.log(err);
@@ -233,8 +234,9 @@ describe('Testing responses for User', () => {
   });
 
   it('Should get page for changing password', async () => {
+    const userFromDb = await User.findOne({ where: { email: currUser.email } });
     const res = await request.agent(server.server)
-      .get('/users/password')
+      .get(`/users/${userFromDb.id}/password`)
       .set('cookie', await getCookie(server, currUser))
       .catch((err) => {
         console.log(err);
@@ -260,7 +262,7 @@ describe('Testing responses for User', () => {
     const isCurrUserExistsBeforeDelQuery = currUserFromDb ? true : false;
 
     await request.agent(server.server)
-      .delete(`/users/user/${currUserFromDb.id}`)
+      .delete(`/users/${currUserFromDb.id}`)
       .set('cookie', await getCookie(server, currUser))
       .catch((err) => {
         console.log(err);

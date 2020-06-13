@@ -14,10 +14,15 @@ export default (app) => {
       reply.render('users/index', { users });
       return reply;
     })
+    .get('/users/new', async (req, reply) => {
+      const user = new User();
+      reply.render('users/new', { user });
+      return reply;
+    })
     .post('/users', async (req, reply) => {
       const user = User.create(req.body.user);
-      user.password = req.body.user.password;
-      user.passwordDigest = encrypt(user.password);
+      const password = req.body.user.password;
+      user.passwordDigest = encrypt(password);
 
       const errors = await validate(user);
       if (!_.isEmpty(errors)) {
@@ -29,12 +34,42 @@ export default (app) => {
       req.flash('info', i18next.t('flash.users.create.success'));
       return reply.redirect(app.reverse('newSession'));
     })
-    .get('/users/new', { name: 'newUser' }, async (req, reply) => {
-      const user = new User();
-      reply.render('users/new', { user });
-      return reply;
+    .get('/users/:userId', async (req, reply) => {
+      const { userId } = req.params;
+
+      const user = await app.orm
+        .getRepository(User)
+        .findOne(userId);
+
+      const keys = Object.keys(user)
+        .filter((key) => !['passwordDigest', 'id'].includes(key));
+
+      return reply.render('users/user', { user, keys });
     })
-    .get('/users/password', { name: 'password' }, async (req, reply) => {
+    .post('/users/:userId/edit', async (req, reply) => {
+      const { userId } = req.params;
+      const { user } = req.body;
+      const userFromDb = await app.orm
+        .getRepository(User)
+        .findOne(userId);
+      userFromDb.email = user.email;
+      userFromDb.firstName = user.firstName;
+      userFromDb.lastName = user.lastName;
+      await userFromDb.save();
+      req.flash('info', i18next.t('views.user.accountUpdated'));
+      return reply.redirect(app.reverse('user'));
+    })
+    .delete('/users/:userId', async (req, reply) => {
+      const { userId } = req.params;
+      const user = await app.orm
+        .getRepository(User)
+        .findOne(userId);
+      await user.remove();
+      req.session.delete();
+      req.flash('info', i18next.t('views.user.accountDeleted'));
+      return reply.redirect(app.reverse('root'));
+    })
+    .get('/users/:userId/password', async (req, reply) => {
       const pass = {
         oldPass: '',
         newPass: '',
@@ -43,9 +78,9 @@ export default (app) => {
       const passKeys = Object.keys(pass)
       return reply.render('users/password/index', { pass, passKeys });
     })
-    .post('/users/password', async (req, reply) => {
+    .post('/users/:userId/password', async (req, reply) => {
+      const { userId } = req.params;
       const pass = req.body.object;
-      const userId = req.session.get('userId');
       const user = await app.orm
         .getRepository(User)
         .findOne(userId);
@@ -63,41 +98,5 @@ export default (app) => {
       await user.save();
       req.flash('info', i18next.t('flash.users.create.passwordChanged'));
       return reply.redirect(app.reverse('user'));
-    })
-    .get('/users/user', { name: 'user' }, async (req, reply) => {
-      const userId = req.session.get('userId');
-
-      const user = await app.orm
-        .getRepository(User)
-        .findOne(userId);
-
-      const keys = Object.keys(user)
-        .filter((key) => !['passwordDigest', 'id'].includes(key));
-
-      return reply.render('users/user', { user, keys });
-    })
-    .post('/users/user', async (req, reply) => {
-      console.log('postpostpost');
-      const { user } = req.body;
-      const userId = req.session.get('userId');
-      const userFromDb = await app.orm
-        .getRepository(User)
-        .findOne(userId);
-      userFromDb.email = user.email;
-      userFromDb.firstName = user.firstName;
-      userFromDb.lastName = user.lastName;
-      await userFromDb.save();
-      req.flash('info', i18next.t('views.user.accountUpdated'));
-      return reply.redirect(app.reverse('user'));
-    })
-    .delete('/users/user/:userId', async (req, reply) => {
-      const { userId } = req.params;
-      const user = await app.orm
-        .getRepository(User)
-        .findOne(userId);
-      await user.remove();
-      req.session.delete();
-      req.flash('info', i18next.t('views.user.accountDeleted'));
-      return reply.redirect(app.reverse('root'));
     });
 };

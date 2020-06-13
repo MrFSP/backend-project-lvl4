@@ -1,4 +1,5 @@
 - const getInputName = (entity, property) => `${entity.constructor.name.toLowerCase()}[${property}]`
+- const currUserId = reply.request.session.get('userId')
 
 mixin formFor(entity = null)
   form.form-signin()&attributes(attributes)
@@ -117,7 +118,7 @@ mixin buttonDeleteUser()
             data-dismiss='modal'
           )= t('views.user.delete.save')
           form(
-            action=`${route('user')}/${user.id}`
+            action=`${route('users')}/${reply.request.session.get('userId')}`
             method='post'
           )
             input(
