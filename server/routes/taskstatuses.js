@@ -30,14 +30,14 @@ export default (app) => {
           .findOne({ name: newTaskStatus.name })
           ? true
           : false;
-        
-        if (!isExists) {
-          req.flash('info', i18next.t(`flash.tasks.status.added`));
-          await TaskStatus.create(newTaskStatus).save();
+
+        if (isExists) {
+          req.flash('error', i18next.t(`flash.tasks.status.exists`));
         } else if (!newTaskStatus.name) {
           req.flash('error', i18next.t(`flash.tasks.status.empty`));
-        } else if (isExists) {
-          req.flash('error', i18next.t(`flash.tasks.status.exists`));
+        } else if (!isExists) {
+          req.flash('info', i18next.t(`flash.tasks.status.added`));
+          await TaskStatus.create(newTaskStatus).save();
         }
 
         return reply.redirect(app.reverse('taskstatuses#index'));
