@@ -1,21 +1,21 @@
 mixin list(items, type)
   each item in items
-    .d-flex.justify-content-center
-      a#navbarDropdown.nav-link.dropdown-toggle.pl-4.text-dark(
+    .col.justify-content-center
+      a#navbarDropdown.nav-link.dropdown-toggle.text-dark(
         href='#'
         role='button'
         data-toggle='dropdown'
         aria-haspopup='true'
         aria-expanded='false'
       ) !{item.name}
-      .dropdown-menu.text-center.py-1(aria-labelledby='navbarDropdown')
+      .dropdown-menu.text-center.py-1(aria-labelledby='dropdownMenuButton')
         button.btn.btn-link.btn-sm.shadow-none.border-0.text-danger(
           type='submit'
           form=`formForDeleteItem${item.name}`
           onclick="return confirm('Вы уверены?')"
         )= t('views.tasks.tasks.delete')
         form(
-          action=`${route('settings')}/${type}/${item.id}`
+          action=`/taskstatuses/${item.id}`
           method='post'
           id=`formForDeleteItem${item.name}`
         )
@@ -28,11 +28,11 @@ mixin list(items, type)
 mixin defaultlist(items)
   each item in items
     .d-flex.justify-content-center
-      a.nav-link.pl-4.text-dark !{item.name}
+      a.nav-link.pl-3.text-dark !{item.name}
 
 mixin settingForm(properties, type)
-  form(
-    action=route('settings')
+  form.mt-3(
+    action=route('taskstatuses#create')
     method='post'
     id=`settings${type}`
   )
@@ -50,13 +50,6 @@ mixin settingForm(properties, type)
             )= t('views.tasks.settings.add')
 
 //- mixins for
-
-mixin oldtask(task)
-  input#FormControlInput.form-control.data-bv-notempty-message(
-    name='oldTask'
-    value=task
-    type='hidden'
-  )
 
 mixin inputTaskName(taskName = '')
   .form-group
@@ -77,10 +70,12 @@ mixin selectTaskStatus(taskStatus)
       )= t('views.tasks.change.status')
       if !taskStatus
         a.h6.btn-link.ml-4.mt-1.mb-1(
-          href=route('settings'),
+          href=route('taskstatuses#index'),
           method='get',
-        )= t('views.tasks.settings.add')
-    select#inlineFormCustomSelect.flex-row.w-auto.form-control(name='task[status]')
+        )= t('views.tasks.settings.edit')
+    select#inlineFormCustomSelect.flex-row.w-auto.form-control(
+      name='task[status]'
+    )
       if taskStatus
         option.form-control(
           value=taskStatus
@@ -111,7 +106,7 @@ mixin btnTagDelete(tag)
     form=`myTaskTag${tag.name}`
   ) !{tag.name}
     form(
-      action=route('tasks')
+      action=route('tasks#index')
       method='post'
       id=`myTaskTag${tag.name}`
     )
@@ -127,14 +122,11 @@ mixin inputTags(taskTags)
       label.mt-1(
         for='FormControlInputTags'
       )= t('views.tasks.settings.tags')
-      .row.mx-0
-        if task
-          each tag in task.tags
-            +btnTagDelete(tag)
     input#FormControlInputTags.form-control.data-bv-notempty-message(
       name='newTags'
       autocomplete='off'
       placeholder= t('views.tasks.new.tag')
+      value=t(taskTags ? joinTags(taskTags) : '')
     )
 
 mixin selectAssignedTo(assignedTo)
@@ -167,7 +159,7 @@ mixin btnTag(tag)
     form=`myTaskTag${tag.name}`
   ) !{tag.name}
     form(
-      action=route('tasks')
+      action=route('tasks#index')
       method='get'
       id=`myTaskTag${tag.name}`
     )
@@ -184,7 +176,7 @@ mixin btnTaskStatus(task)
       form=`myTaskStatus${task.status}`
     ) !{task.status}
       form(
-        action=route('tasks')
+        action=route('tasks#index')
         method='get'
         id=`myTaskStatus${task.status}`
       )
@@ -200,7 +192,7 @@ mixin btnAssignedToFilter(task, users)
     form=`myTaskAssignedTo${task.assignedTo}`
   ) !{users[task.assignedTo] ? users[task.assignedTo].fullName : ''}
     form(
-      action=route('tasks')
+      action=route('tasks#index')
       method='get'
       id=`myTaskAssignedTo${task.assignedTo}`
     )
@@ -237,20 +229,10 @@ mixin taskCard(task)
                       +btnTag(tag)
                 .col
                   a.btn.btn-link.btn-sm.shadow-none.border-0.text-primary.mt-1(
-                    href=`${route('tasks')}/${task.id}/edit`
+                    href=`/tasks/${task.id}/edit`
                   )= t('views.tasks.tasks.change')
-                  //- form(
-                  //-   action=`${route('tasks')}/${task.id}/edit`
-                  //-   method='get'
-                  //-   id=`formForTaskChange${task.id}`
-                  //- )
-                  //-   input(
-                  //-     name='taskId'
-                  //-     value=task.id
-                  //-     type='hidden'
-                  //-   )
                   form(
-                    action=`${route('tasks')}/${task.id}`
+                    action=`/tasks/${task.id}`
                     method='post'
                   )
                     input(

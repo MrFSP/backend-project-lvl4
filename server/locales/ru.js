@@ -82,7 +82,7 @@ module.exports = {
         settings: {
           newTag: {
             name: 'Теги',
-            add: 'Добавить тег',
+            edit: 'Добавить тег',
             success: 'Тег удалён',
           },
           newTaskStatus: {
@@ -94,6 +94,7 @@ module.exports = {
           add: 'Добавить',
           back: 'Вернуться',
           settings: 'Настройки',
+          edit: 'Изменить',
           tags: 'Теги',
         },
         tasks: {

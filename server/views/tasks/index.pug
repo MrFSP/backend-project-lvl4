@@ -5,19 +5,19 @@ block content
   .container.col-10.justify-content-center
     .row.justify-content-center
       a.btn.shadow-none.border-0.mb-0(
-        href=route('tasks')
+        href=route('tasks#index')
       )
         .h3= t('views.tasks.tasks.title')
     .row.justify-content-between
       a.nav-link(
-        href=`${route('tasks')}/new`
+        href=route('tasks#new')
       )= t('views.tasks.new.create')
       button.btn.btn-link.shadow-none.border-0.mr-5.pr-3(
         type='submit'
         form='myTask'
       )= t('views.tasks.tasks.myTasks')
         form(
-          action=route('tasks')
+          action=route('tasks#index')
           method='get'
           id='myTask'
         )
@@ -35,7 +35,7 @@ block content
     #collapseForm.collapse.pb-2
       .col
         form.row(
-          action=route('tasks')
+          action=route('tasks#index')
           method='get'
           id='filterForm'
         )
