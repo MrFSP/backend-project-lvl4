@@ -5,6 +5,7 @@ import path from 'path';
 import _ from 'lodash';
 import faker from 'faker';
 import TaskStatus from '../server/entity/TaskStatus';
+import defaultStatuses from '../server/configs/statuses.config';
 
 import app from '../server';
 
@@ -49,17 +50,6 @@ describe('Testing task statuses CRUD in app', () => {
     await server.ready();
   });
 
-  it('Should get page "/taskstatuses"', async () => {
-    const res = await request.agent(server.server)
-      .get('/taskstatuses')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-    });
-
-    expect(res).toHaveHTTPStatus(200);
-  });
-
   it('Should set new task status', async () => {
     const successResponse1 = await request.agent(server.server)
       .post('/taskstatuses')
@@ -72,12 +62,20 @@ describe('Testing task statuses CRUD in app', () => {
     const successResponse2 = await request.agent(server.server)
       .post('/taskstatuses')
       .set('cookie', await getCookie(server, currUser))
-      .send({ newTaskStatus: newTaskStatus })
+      .send({ newTaskStatus: defaultStatuses[0] })
       .catch((err) => {
         console.log(err);
       });
 
     const successResponse3 = await request.agent(server.server)
+      .post('/taskstatuses')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ newTaskStatus: newTaskStatus })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const successResponse4 = await request.agent(server.server)
       .post('/taskstatuses')
       .set('cookie', await getCookie(server, currUser))
       .send({ newTaskStatus: { name: '' } })
@@ -92,8 +90,20 @@ describe('Testing task statuses CRUD in app', () => {
     expect(successResponse1).toHaveHTTPStatus(302);
     expect(successResponse2).toHaveHTTPStatus(302);
     expect(successResponse3).toHaveHTTPStatus(302);
+    expect(successResponse4).toHaveHTTPStatus(302);
     expect(statuses.length).toBe(1);
     expect(status.name).toEqual(newTaskStatus.name);
+  });
+
+  it('Should get page "/taskstatuses"', async () => {
+    const res = await request.agent(server.server)
+      .get('/taskstatuses')
+      .set('cookie', await getCookie(server, currUser))
+      .catch((err) => {
+        console.log(err);
+    });
+
+    expect(res).toHaveHTTPStatus(200);
   });
 
   it('Should delete task status', async () => {
