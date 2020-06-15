@@ -28,7 +28,7 @@ class Task extends BaseEntity {
   @ManyToMany(
     () => Tag,
     tag => tag.tasks,
-    { eager: true }
+    { eager: true, cascade: true }
   )
   @JoinTable()
   tags = Promise;
