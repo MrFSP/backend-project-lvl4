@@ -6,8 +6,6 @@ import _ from 'lodash';
 import faker from 'faker';
 import User from '../server/entity/User';
 import Task from '../server/entity/Task';
-import TaskStatus from '../server/entity/TaskStatus';
-import Tag from '../server/entity/Tag';
 import encrypt from '../server/lib/secure.js';
 
 import app from '../server';
@@ -26,18 +24,16 @@ const changedUser = {
   lastName: `changed${currUser.lastName}`,
 };
 
-const newTag = faker.lorem.word();
-const anotherTag = { name: faker.lorem.word() };
-const tagForDeletiog = { name: faker.lorem.word() };
 const newTaskStatus = { name: faker.lorem.word() };
-const anotherTaskStatus = {name: faker.lorem.word()};
-const taskStatusForDeleting = { name: faker.lorem.word() };
 
 const newTask = {
   name: faker.lorem.word(),
   status: newTaskStatus.name,
   description: faker.lorem.text(),
+  assignedTo: 1,
 };
+
+const tagsForNewTask = `${faker.lorem.word()}, ${faker.lorem.word()}`;
 
 const newTaskWithEmptyName = {
   name: '',
@@ -51,19 +47,14 @@ const newTaskWithEmptyTaskStatus = {
   description: newTask.description,
 };
 
-const anotherNewTask = {
-  name: `another ${newTask.name}`,
-  status: anotherTaskStatus.name,
-  description: `another ${newTask.description}`,
-  assignedTo: 1,
-  creator: 1,
-};
-
 const changedNewTask = {
   name: faker.lorem.word(),
   status: newTaskStatus.name,
   description: faker.lorem.text(),
+  assignedTo: 1,
 };
+
+const tagsForChangedNewTask = `${faker.lorem.word()}, ${faker.lorem.word()}`;
 
 const getCookie = async (server, user) => {
   const res = await request.agent(server.server)
@@ -75,20 +66,10 @@ const getCookie = async (server, user) => {
   return res.header['set-cookie'];
 };
 
-// const pathToFixtures = path.join(__dirname, '__fixtures__');
-
-// let afterSignInPagehtml;
-// let changeTaskPagehtml;
-// let filteredTaskPagehtml;
-
 describe('Testing changes in app', () => {
   let server;
 
   beforeAll(async () => {
-    // afterSignInPagehtml = await fs.readFile(path.join(pathToFixtures, 'after-sign-in-page.html'));
-    // changeTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'change-task-page.html'));
-    // filteredTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'filtered-task-page.html'));
-
     expect.extend(matchers);
     server = app();
     await server.ready();
@@ -120,157 +101,28 @@ describe('Testing changes in app', () => {
     expect(res).toHaveHTTPStatus(200);
   });
 
-  it('Should set new tag', async () => {
-    const successResponse1 = await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTag: newTag })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const successResponse2 = await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTag: newTag })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const successResponse3 = await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTag: { name: '' } })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const tags = await Tag.find();
-    const tag = await Tag.findOne({ where: { name: newTag.name } });
-
-    expect(successResponse1).toHaveHTTPStatus(302);
-    expect(successResponse2).toHaveHTTPStatus(302);
-    expect(successResponse3).toHaveHTTPStatus(302);
-    expect(tags.length).toBe(1);
-    expect(tag.name).toEqual(newTag.name);
-  });
-
-  it('Should delete tag', async () => {
-    await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTag: tagForDeletiog })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const tagBeforeDeleting = await Tag
-      .findOne({ where: { name: tagForDeletiog.name } });
-
-    expect(tagBeforeDeleting.name).toEqual(tagForDeletiog.name);
-
-    await request.agent(server.server)
-      .delete(`/tasks/settings/tagId/${tagBeforeDeleting.id}`)
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-    
-    const tags = await Tag.find();
-    const tag = await Tag
-      .findOne({ where: { name: tagBeforeDeleting.name } });
-    
-    expect(tags.length).toBe(1);
-    expect(tag).toBe(undefined);
-  });
-
-  it('Should set new task status', async () => {
-    const successResponse1 = await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTaskStatus: newTaskStatus })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const successResponse2 = await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTaskStatus: newTaskStatus })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const successResponse3 = await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTaskStatus: { name: '' } })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const statuses = await TaskStatus.find();
-    const status = await TaskStatus.findOne({ where: { name: newTaskStatus.name } });
-
-    expect(successResponse1).toHaveHTTPStatus(302);
-    expect(successResponse2).toHaveHTTPStatus(302);
-    expect(successResponse3).toHaveHTTPStatus(302);
-    expect(statuses.length).toBe(1);
-    expect(status.name).toEqual(newTaskStatus.name);
-  });
-
-  it('Should delete task status', async () => {
-    await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTaskStatus: taskStatusForDeleting })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const statusBeforeDeleting = await TaskStatus
-      .findOne({ where: { name: taskStatusForDeleting.name } });
-
-    expect(statusBeforeDeleting.name).toEqual(taskStatusForDeleting.name);
-
-    await request.agent(server.server)
-      .delete(`/tasks/settings/taskStatusId/${statusBeforeDeleting.id}`)
-      .set('cookie', await getCookie(server, currUser))
-      .send({ taskStatusId: statusBeforeDeleting.id })
-      .catch((err) => {
-        console.log(err);
-      });
-    
-    const statuses = await TaskStatus.find();
-    const status = await TaskStatus
-      .findOne({ where: { name: taskStatusForDeleting.name } });
-    
-    expect(statuses.length).toBe(1);
-    expect(status).toBe(undefined);
-  });
-
   it('Should create new task', async () => {
 
-    const res = await request.agent(server.server)
-      .post('/tasks/new')
+    await request.agent(server.server)
+      .post('/tasks')
       .set('cookie', await getCookie(server, currUser))
-      .send({ task: newTask, newTags: newTag })
+      .send({ task: newTask, newTags: tagsForNewTask })
       .catch((err) => {
         console.log(err);
       });
 
     await request.agent(server.server)
-      .post('/tasks/new')
+      .post('/tasks')
       .set('cookie', await getCookie(server, currUser))
-      .send({ task: newTaskWithEmptyName, tagsForTask: newTag })
+      .send({ task: newTaskWithEmptyName })
       .catch((err) => {
         console.log(err);
       });
 
     await request.agent(server.server)
-      .post('/tasks/new')
+      .post('/tasks')
       .set('cookie', await getCookie(server, currUser))
-      .send({ task: newTaskWithEmptyTaskStatus, tagsForTask: newTag })
+      .send({ task: newTaskWithEmptyTaskStatus })
       .catch((err) => {
         console.log(err);
       });
@@ -283,81 +135,40 @@ describe('Testing changes in app', () => {
     expect(tasks.length).toBe(1);
   });
 
-  it('Should create new task with array of tags', async () => {
-    await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTag: anotherTag })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await request.agent(server.server)
-      .post('/tasks/new')
-      .set('cookie', await getCookie(server, currUser))
-      .send({
-        task: anotherNewTask,
-        tagsForTask: {
-          name: [newTag.name, anotherTag.name],
-        },
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const taskFromDB = await Task
-      .findOne({ where: { name: anotherNewTask.name } });
-
-    expect(taskFromDB.description).toEqual(anotherNewTask.description);
-    expect(taskFromDB.status).toEqual(anotherNewTask.status);
-
-    await request.agent(server.server)
-      .delete(`/tasks/${taskFromDB.id}`)
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const taskFromDBAfterDeleting = await Task
-      .findOne({ where: { name: anotherNewTask.name } });
-
-    expect(taskFromDBAfterDeleting).toBe(undefined);
-  });
-
-  it('Should get page /tasks/change', async () => {
+  it('Should get page /tasks/:id/edit', async () => {
     const task = await Task.findOne({ where: { name: newTask.name } });
 
     const res = await request.agent(server.server)
-      .get(`/tasks/change?taskId=${task.id}`)
+      .get(`/tasks/${task.id}/edit`)
       .set('cookie', await getCookie(server, currUser))
       .catch((err) => {
         console.log(err);
       });
 
     expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(changeTaskPagehtml.toString());
   });
 
   it('Should change task', async () => {
     const newTaskFromDB = await Task.findOne({ where: { name: newTask.name } });
 
     await request.agent(server.server)
-      .post('/tasks/change')
+      .patch(`/tasks/${newTaskFromDB.id}`)
       .set('cookie', await getCookie(server, currUser))
-      .send({ task: changedNewTask, oldTask: JSON.stringify(newTaskFromDB) })
+      .send({ task: changedNewTask, newTags: tagsForChangedNewTask })
       .catch((err) => {
         console.log(err);
       });
 
     const res = await request.agent(server.server)
-      .post('/tasks/change')
+      .patch(`/tasks/${newTaskFromDB.id}`)
       .set('cookie', await getCookie(server, currUser))
-      .send({ task: newTaskWithEmptyName, oldTask: JSON.stringify(newTaskFromDB) })
+      .send({ task: newTaskWithEmptyName })
       .catch((err) => {
         console.log(err);
       });
 
-    const changedTaskFromDB = await Task.findOne({ where: { name: changedNewTask.name } });
+    const changedTaskFromDB = await Task
+      .findOne({ where: { name: changedNewTask.name } });
 
     expect(changedTaskFromDB.description).toEqual(changedNewTask.description);
     expect(newTaskFromDB.id).toEqual(changedTaskFromDB.id);
@@ -366,38 +177,39 @@ describe('Testing changes in app', () => {
 
   it('Should get filtered task', async () => {
     await request.agent(server.server)
-      .post('/tasks/settings')
-      .send({ newTaskStatus: anotherTaskStatus })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await request.agent(server.server)
-      .post('/tasks/new')
+      .post('/tasks')
       .set('cookie', await getCookie(server, currUser))
-      .send({ task: anotherNewTask })
+      .send({ task: newTask, newTags: tagsForNewTask })
       .catch((err) => {
         console.log(err);
       });
 
     const res = await request.agent(server.server)
-      .post('/tasks')
+      .get('/tasks')
       .set('cookie', await getCookie(server, currUser))
-      .send({ filter: { taskStatus: 'filtered status' } })
+      .query({
+        filter: {
+          status: newTask.status,
+          assignedTo: newTask.assignedTo,
+          tags: tagsForNewTask
+        }
+      })
       .catch((err) => {
         console.log(err);
       });
 
+    console.log('resresres');
+    console.log(res);
+
     expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(filteredTaskPagehtml.toString());
   });
 
   it('Should not change password', async () => {
     const userFromDbBeforeRequest = await User
       .findOne({ where: { email: currUser.email } });
 
-      const res1 = await request.agent(server.server)
-      .post('/users/password')
+    const res1 = await request.agent(server.server)
+      .post(`/users/${userFromDbBeforeRequest.id}/password`)
       .set('cookie', await getCookie(server, currUser))
       .send({
         object: {
@@ -411,7 +223,7 @@ describe('Testing changes in app', () => {
       });
 
     const res2 = await request.agent(server.server)
-      .post('/users/password')
+      .post(`/users/${userFromDbBeforeRequest.id}/password`)
       .set('cookie', await getCookie(server, currUser))
       .send({
         object: {
@@ -433,8 +245,11 @@ describe('Testing changes in app', () => {
   });
 
   it('Should get changed password', async () => {
+    const userFromDbBeforeRequest = await User
+      .findOne({ where: { email: currUser.email }});
+
     await request.agent(server.server)
-      .post('/users/password')
+      .post(`/users/${userFromDbBeforeRequest.id}/password`)
       .set('cookie', await getCookie(server, currUser))
       .send({
         object: {
@@ -448,7 +263,7 @@ describe('Testing changes in app', () => {
       });
 
     await request.agent(server.server)
-      .post('/users/password')
+      .post(`/users/${userFromDbBeforeRequest.id}/password`)
       .set('cookie', await getCookie(server, currUser))
       .send({
         object: {
@@ -461,17 +276,21 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
-    const userFromDb = await User.findOne({ where: { email: currUser.email } });
+    const userFromDbAfterRequest = await User
+      .findOne({ where: { email: currUser.email } });
 
-    expect(userFromDb.passwordDigest).toEqual(encrypt(changedUser.password));
+    expect(userFromDbAfterRequest.passwordDigest)
+      .toEqual(encrypt(changedUser.password));
 
     currUser.password = changedUser.password;
   });
 
   it('user data should be changed', async () => {
+    const userFromDbBeforeRequest = await User
+      .findOne({ where: { email: currUser.email }});
 
     await request.agent(server.server)
-      .post('/users/user')
+      .patch(`/users/${userFromDbBeforeRequest.id}`)
       .set('cookie', await getCookie(server, currUser))
       .send({
         user: {
@@ -484,10 +303,11 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
-    const userFromDb = await User.findOne({ where: { email: changedUser.email } });
+    const userFromDbAfterRequest = await User
+      .findOne({ where: { email: changedUser.email } });
 
-    expect(userFromDb.firstName).toEqual(changedUser.firstName);
-    expect(userFromDb.lastName).toEqual(changedUser.lastName);
+    expect(userFromDbAfterRequest.firstName).toEqual(changedUser.firstName);
+    expect(userFromDbAfterRequest.lastName).toEqual(changedUser.lastName);
   });
 
   it('Should delete task', async () => {
@@ -498,7 +318,7 @@ describe('Testing changes in app', () => {
     }
 
     await request.agent(server.server)
-      .post('/tasks/new')
+      .post('/tasks')
       .set('cookie', await getCookie(server, changedUser))
       .send({ task: taskForDeleting })
       .catch((err) => {

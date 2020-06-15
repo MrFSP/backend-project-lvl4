@@ -114,7 +114,8 @@ describe('Testing responses for User', () => {
         console.log(err);
       });
 
-    const userFromDb = await User.findOne({ where: { email: wrongEmailUser.email } });
+    const userFromDb = await User
+      .findOne({ where: { email: wrongEmailUser.email } });
 
     expect(userFromDb).toBe(undefined);
   });
@@ -131,8 +132,6 @@ describe('Testing responses for User', () => {
 
     expect(usersFromDb.length).toEqual(1);
   });
-
-
 
   it('should return 404', async () => {
     const res = await request.agent(server.server)
@@ -166,10 +165,10 @@ describe('Testing responses for User', () => {
     expect(res).toHaveHTTPStatus(200);
   });
 
-  it('Should return page "/users/:id"', async () => {
+  it('Should return page "/users/:id/edit"', async () => {
     const userFromDb = await User.findOne({ where: { email: currUser.email } });
     const res = await request.agent(server.server)
-      .get(`/users/${userFromDb.id}`)
+      .get(`/users/${userFromDb.id}/edit`)
       .set('cookie', await getCookie(server, currUser))
       .catch((err) => {
         console.log(err);
@@ -211,26 +210,6 @@ describe('Testing responses for User', () => {
     
     expect(res).toHaveHTTPStatus(200);
     // expect(res.text.toString()).toEqual(newTaskPagehtml.toString());
-  });
-
-  it('Should get page "/tasks/settings"', async () => {
-    await request.agent(server.server)
-      .post('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTaskStatus: defaultTaskStatus })
-      .catch((err) => {
-        console.log(err);
-    });
-
-    const res = await request.agent(server.server)
-      .get('/tasks/settings')
-      .set('cookie', await getCookie(server, currUser))
-      .catch((err) => {
-        console.log(err);
-      });
-    
-    expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(settingsPagehtml.toString());
   });
 
   it('Should get page for changing password', async () => {
