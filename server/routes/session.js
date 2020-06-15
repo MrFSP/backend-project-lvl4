@@ -22,7 +22,7 @@ export default (app) => {
       req.session.set('userId', user.id);
       req.session.set('userEmail', user.email);
       req.flash('info', i18next.t('flash.session.create.success'));
-      return reply.redirect(app.reverse('tasks'));
+      return reply.redirect(app.reverse('tasks#index'));
     })
     .delete('/session', (req, reply) => {
       req.session.set('userId', null);

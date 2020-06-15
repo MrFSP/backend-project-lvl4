@@ -9,17 +9,17 @@ import User from '../entity/User.js';
 
 export default (app) => {
   app
-    .get('/users', { name: 'users' }, async (req, reply) => {
+    .get('/users', { name: 'users#index' }, async (req, reply) => {
       const users = await app.orm.getRepository(User).find();
       reply.render('users/index', { users });
       return reply;
     })
-    .get('/users/new', async (req, reply) => {
+    .get('/users/new', { name: 'users#new' }, async (req, reply) => {
       const user = new User();
       reply.render('users/new', { user });
       return reply;
     })
-    .post('/users', async (req, reply) => {
+    .post('/users', { name: 'users#create' }, async (req, reply) => {
       const user = User.create(req.body.user);
       const password = req.body.user.password;
       user.passwordDigest = encrypt(password);
@@ -34,7 +34,7 @@ export default (app) => {
       req.flash('info', i18next.t('flash.users.create.success'));
       return reply.redirect(app.reverse('newSession'));
     })
-    .get('/users/:userId', async (req, reply) => {
+    .get('/users/:userId/edit', { name: 'users#edit' }, async (req, reply) => {
       const { userId } = req.params;
 
       const user = await app.orm
@@ -46,7 +46,7 @@ export default (app) => {
 
       return reply.render('users/user', { user, keys });
     })
-    .post('/users/:userId/edit', async (req, reply) => {
+    .patch('/users/:userId', { name: 'users#update' }, async (req, reply) => {
       const { userId } = req.params;
       const { user } = req.body;
       const userFromDb = await app.orm
@@ -59,7 +59,7 @@ export default (app) => {
       req.flash('info', i18next.t('views.user.accountUpdated'));
       return reply.redirect(app.reverse('user'));
     })
-    .delete('/users/:userId', async (req, reply) => {
+    .delete('/users/:userId', { name: 'users#destroy' }, async (req, reply) => {
       const { userId } = req.params;
       const user = await app.orm
         .getRepository(User)
@@ -69,17 +69,21 @@ export default (app) => {
       req.flash('info', i18next.t('views.user.accountDeleted'));
       return reply.redirect(app.reverse('root'));
     })
-    .get('/users/:userId/password', async (req, reply) => {
-      const pass = {
-        oldPass: '',
-        newPass: '',
-        confirmNewPass: '',
+    .get(
+      '/users/:id/password',
+      { name: 'users/password#update' },
+      async (req, reply) => {
+        const pass = {
+          oldPass: '',
+          newPass: '',
+          confirmNewPass: '',
+        }
+        const passKeys = Object.keys(pass)
+        return reply.render('users/password/index', { pass, passKeys });
       }
-      const passKeys = Object.keys(pass)
-      return reply.render('users/password/index', { pass, passKeys });
-    })
-    .post('/users/:userId/password', async (req, reply) => {
-      const { userId } = req.params;
+    )
+    .post('/users/:id/password', async (req, reply) => {
+      const userId = req.params.id;
       const pass = req.body.object;
       const user = await app.orm
         .getRepository(User)
@@ -87,16 +91,16 @@ export default (app) => {
       const isCorrectOldPassword = encrypt(pass.oldPass) === user.passwordDigest;
       if (!isCorrectOldPassword) {
         req.flash('error', i18next.t('flash.users.create.wrongOldPass'));
-        return reply.redirect(app.reverse('password'));
+        return reply.redirect(`/users/${userId}/password`);
       }
       const isCorrectRepeatedPassword = pass.newPass === pass.confirmNewPass;
       if (!isCorrectRepeatedPassword) {
         req.flash('error', i18next.t('flash.users.create.wrongConfirmation'));
-        return reply.redirect(app.reverse('password'));
+        return reply.redirect(`/users/${userId}/password`);
       }
       user.passwordDigest = encrypt(pass.newPass);
       await user.save();
       req.flash('info', i18next.t('flash.users.create.passwordChanged'));
-      return reply.redirect(app.reverse('user'));
+      return reply.redirect(`/users/${userId}/edit`);
     });
 };
