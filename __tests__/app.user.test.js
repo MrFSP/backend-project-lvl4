@@ -21,7 +21,7 @@ const wrongEmailUser = {
   password: faker.internet.password(),
 };
 
-const defaultTaskStatus = { name: 'Новый' };
+// const defaultTaskStatus = { name: 'Новый' };
 
 const getCookie = async (server, user) => {
   const res = await request.agent(server.server)
@@ -32,12 +32,6 @@ const getCookie = async (server, user) => {
     });
   return res.header['set-cookie'];
 };
-
-// let userPagehtml;
-// let newTaskPagehtml;
-// let settingsPagehtml;
-// let changePassPagehtml;
-// let logoutPagehtml;
 
 describe('Testing responses for Guest', () => {
   let server;
@@ -77,11 +71,6 @@ describe('Testing responses for User', () => {
   let server;
 
   beforeAll(async () => {
-    // userPagehtml = await fs.readFile(path.join(pathToFixtures, 'user-page.html'));
-    // newTaskPagehtml = await fs.readFile(path.join(pathToFixtures, 'newtask-page.html'));
-    // settingsPagehtml = await fs.readFile(path.join(pathToFixtures, 'settings-page.html'));
-    // changePassPagehtml = await fs.readFile(path.join(pathToFixtures, 'change-pass-page.html'));
-    // logoutPagehtml = await fs.readFile(path.join(pathToFixtures, 'logout-page.html'));
 
     expect.extend(matchers);
     server = app();
@@ -175,7 +164,6 @@ describe('Testing responses for User', () => {
       });
 
     expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(userPagehtml.toString());
   });
 
   it('User should be redirected to "/tasks"', async () => {
@@ -209,7 +197,6 @@ describe('Testing responses for User', () => {
       });
     
     expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(newTaskPagehtml.toString());
   });
 
   it('Should get page for changing password', async () => {
@@ -222,7 +209,6 @@ describe('Testing responses for User', () => {
       });
 
     expect(res).toHaveHTTPStatus(200);
-    // expect(res.text.toString()).toEqual(changePassPagehtml.toString());
   });
 
   it('Should delete current session', async () => {
@@ -233,7 +219,6 @@ describe('Testing responses for User', () => {
       });
     
     expect(res).toHaveHTTPStatus(302);
-    // expect(res.text.toString()).toEqual(logoutPagehtml.toString());
   });
 
   it('Should delete current user', async () => {
