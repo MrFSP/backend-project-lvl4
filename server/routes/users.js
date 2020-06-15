@@ -34,8 +34,8 @@ export default (app) => {
       req.flash('info', i18next.t('flash.users.create.success'));
       return reply.redirect(app.reverse('newSession'));
     })
-    .get('/users/:userId/edit', { name: 'users#edit' }, async (req, reply) => {
-      const { userId } = req.params;
+    .get('/users/:id/edit', { name: 'users#edit' }, async (req, reply) => {
+      const userId = req.params.id;
 
       const user = await app.orm
         .getRepository(User)
@@ -46,8 +46,8 @@ export default (app) => {
 
       return reply.render('users/user', { user, keys });
     })
-    .patch('/users/:userId', { name: 'users#update' }, async (req, reply) => {
-      const { userId } = req.params;
+    .patch('/users/:id', { name: 'users#update' }, async (req, reply) => {
+      const userId = req.params.id;
       const { user } = req.body;
       const userFromDb = await app.orm
         .getRepository(User)
@@ -60,7 +60,7 @@ export default (app) => {
       return reply.redirect(app.reverse('user'));
     })
     .delete('/users/:userId', { name: 'users#destroy' }, async (req, reply) => {
-      const { userId } = req.params;
+      const userId = req.params.id;
       const user = await app.orm
         .getRepository(User)
         .findOne(userId);
