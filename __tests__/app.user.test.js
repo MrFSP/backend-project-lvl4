@@ -67,7 +67,7 @@ describe('Testing responses for Guest', () => {
 
 });
 
-describe('Testing responses for User', () => {
+describe('Testing responses for registered User', () => {
   let server;
 
   beforeAll(async () => {

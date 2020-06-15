@@ -236,7 +236,8 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
-    const userFromDbAfterRequest = await User.findOne({ where: { email: currUser.email } });
+    const userFromDbAfterRequest = await User
+      .findOne({ where: { email: currUser.email } });
 
     expect(userFromDbBeforeRequest.passwordDigest)
       .toEqual(userFromDbAfterRequest.passwordDigest);
@@ -244,7 +245,7 @@ describe('Testing changes in app', () => {
     expect(res2).toHaveHTTPStatus(302);
   });
 
-  it('Should get changed password', async () => {
+  it("User's password should be changed", async () => {
     const userFromDbBeforeRequest = await User
       .findOne({ where: { email: currUser.email }});
 
@@ -285,7 +286,7 @@ describe('Testing changes in app', () => {
     currUser.password = changedUser.password;
   });
 
-  it('user data should be changed', async () => {
+  it("User's data should be changed", async () => {
     const userFromDbBeforeRequest = await User
       .findOne({ where: { email: currUser.email }});
 
@@ -337,7 +338,8 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
-    const taskForDeletingFromDbAfterQuery = await Task.findOne({ where: { name: taskForDeleting.name } })
+    const taskForDeletingFromDbAfterQuery = await Task
+      .findOne({ where: { name: taskForDeleting.name } })
     const isTaskForDeletingExistsAfterQuery = taskForDeletingFromDbAfterQuery 
       ? true
       : false;
