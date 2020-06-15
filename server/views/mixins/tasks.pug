@@ -165,7 +165,7 @@ mixin btnTag(tag)
     )
       input(
         name='tags'
-        value=tag
+        value=tag.name
         type='hidden'
       )
 
@@ -225,8 +225,9 @@ mixin taskCard(task)
               .row.ml-0.mr-0
                 span.d-flex.align-items-top.mt-1
                   .col
-                    each tag in task.tags
-                      +btnTag(tag)
+                    if task.tags
+                      each tag in task.tags
+                        +btnTag(tag)
                 .col
                   a.btn.btn-link.btn-sm.shadow-none.border-0.text-primary.mt-1(
                     href=`/tasks/${task.id}/edit`
@@ -284,13 +285,17 @@ mixin filterByTaskStatus(taskStatuses)
 
 mixin filterByTag(tags)
   .form-group.col-md-4.mb-2
-    select.form-control(name='tags')
-      option.form-control(
-        selected=''
-        disabled=''
-        value=''
-      )= t('views.tasks.tasks.tag')
-      each tag in tags
-        option.form-control(
-          value=tag.id
-        )= t(`${tag.name}`)
+    input.form-control(
+      name='tags'
+      placeholder='Введите теги'
+    )
+    //- select.form-control(name='tags')
+    //-   option.form-control(
+    //-     selected=''
+    //-     disabled=''
+    //-     value=''
+    //-   )= t('views.tasks.tasks.tag')
+    //-   each tag in tags
+    //-     option.form-control(
+    //-       value=tag.id
+    //-     )= t(`${tag.name}`)

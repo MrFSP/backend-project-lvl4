@@ -19,12 +19,14 @@ html(lang="en").h-100.pt-4
       #navbarSupportedContent.collapse.navbar-collapse
         ul.navbar-nav.mr-auto
           li.nav-item
-            a.nav-link(href=route('users'))= t('layouts.application.users')
+            a.nav-link(
+              href=route('users#index')
+            )= t('layouts.application.users')
         ul.navbar-nav
           if reply.request.signedIn
             li.nav-item
               a.nav-link(
-                href=`${route('users')}/${currUserId}`
+                href=`/users/${currUserId}/edit`
               ) !{reply.request.session.get('userEmail')}
             li.nav-item
               +buttonTo(
@@ -41,7 +43,7 @@ html(lang="en").h-100.pt-4
               )= t('layouts.application.signIn')
             li.nav-item
               a.nav-link(
-                href=`${route('users')}/new`
+                href=route('users#new')
               )= t('layouts.application.signUp')
     .container.mt-4.pt-4
 
