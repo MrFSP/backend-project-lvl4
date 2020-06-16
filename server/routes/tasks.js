@@ -46,8 +46,8 @@ const getTags = async (app, newTags) => {
     return Promise.all(tags)
 };
 
-export const filterTasks = async (app, filter) => {
-  const getTagsNames = (tagsNames) => tagsNames.split(',').map((tagName) => tagName.trim());
+const filterTasks = async (app, filter) => {
+  const getTagsNames = (tagsNames) => tagsNames.replace(',', '').split(' ').filter((i) => i !== ' ').map(tagName => _.capitalize(tagName.trim()));
 
   const query = [
     filter.status ? 'task.status = :status' : null,
@@ -78,7 +78,7 @@ export default (app) => {
       const filter = { ...req.query };
 
       const tasks = !_.isEmpty(filter)
-        ? filterTasks(app, filter)
+        ? await filterTasks(app, filter)
         : await app.orm.getRepository(Task).find();
 
       const users = await getUsersFullnames(app);
