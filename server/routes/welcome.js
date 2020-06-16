@@ -7,6 +7,6 @@ export default (app) => {
       if (!userId) {
         return reply.render('welcome/index');
       }
-      reply.redirect(app.reverse('tasks'));
+      reply.redirect(app.reverse('tasks#index'));
     });
 };

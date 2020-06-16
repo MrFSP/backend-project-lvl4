@@ -23,6 +23,9 @@ module.exports = {
         },
       },
       tasks: {
+        create: {
+          error: 'Введите название задачи',
+        },
         empty: 'Введите имя статуса или тега',
         error: 'Непредвиденная ошибка',
         info: {
@@ -37,6 +40,7 @@ module.exports = {
           exists: 'Тег с таким именем уже существует',
           empty: 'Введите имя тега',
           added: 'Тег добавлен',
+          createError: 'Неверно введены теги'
         },
       }
     },
@@ -71,13 +75,14 @@ module.exports = {
         },
         new: {
           title: 'Новая задача',
-          description: 'Введите описание задачи',
+          description: 'введите описание задачи',
           create: 'Создать задачу',
+          tag: 'введите названия тегов через запятую'
         },
         settings: {
           newTag: {
             name: 'Теги',
-            add: 'Добавить тег',
+            edit: 'Добавить тег',
             success: 'Тег удалён',
           },
           newTaskStatus: {
@@ -89,6 +94,7 @@ module.exports = {
           add: 'Добавить',
           back: 'Вернуться',
           settings: 'Настройки',
+          edit: 'Изменить',
           tags: 'Теги',
         },
         tasks: {

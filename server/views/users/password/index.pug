@@ -5,15 +5,15 @@ block content
     .d-flex.flex-column
       h1.h3.mb-3.font-weight-normal.text-center Изменение пароля
       +formToChangeUserData()(
-                action=route('password')
-                method='post'
-                id="data"
-              )
+        action=`/users/${currUserId}/password`
+        method='post'
+        id="data"
+      )
         each key in passKeys
           +inputToChangePass(pass, key)
     .d-flex.justify-content-between
       a.btn.btn-link(
-                href=route('user'),
+                href=`/users/${currUserId}/edit`,
                 method='get',
               )= t('views.user.password.back')
       button.btn.btn-link(

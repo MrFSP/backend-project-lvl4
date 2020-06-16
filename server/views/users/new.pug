@@ -5,7 +5,7 @@ block header
 
 block content
   .container.col-4.justify-content-center
-    +formFor()(action=route('users') method='post')
+    +formFor()(action=route('users#create') method='post')
       +input(user, 'email', errors)(type="text")
       +input(user, 'password', errors)(type="password")
       +submit.mt-4(user)(value=t('views.users.new.submit'))

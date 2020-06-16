@@ -1,5 +1,3 @@
-- const getInputName = (entity, property) => `${entity.constructor.name.toLowerCase()}[${property}]`
-
 mixin formFor(entity = null)
   form.form-signin()&attributes(attributes)
     block
@@ -117,7 +115,7 @@ mixin buttonDeleteUser()
             data-dismiss='modal'
           )= t('views.user.delete.save')
           form(
-            action=`${route('user')}/${user.id}`
+            action=`users/${reply.request.session.get('userId')}`
             method='post'
           )
             input(
