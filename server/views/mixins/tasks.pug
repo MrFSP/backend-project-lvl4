@@ -70,7 +70,7 @@ mixin selectTaskStatus(taskStatus)
       )= t('views.tasks.change.status')
       if !taskStatus
         a.h6.btn-link.ml-4.mt-1.mb-1(
-          href=route('taskstatuses#index'),
+          href=route('taskstatuses#edit'),
           method='get',
         )= t('views.tasks.settings.edit')
     select#inlineFormCustomSelect.flex-row.w-auto.form-control(

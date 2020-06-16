@@ -4,7 +4,7 @@ import defaultStatuses from '../configs/statuses.config';
 
 export default (app) => {
   app
-    .get('/taskstatuses', { name: 'taskstatuses#index' }, async (req, reply) => {
+    .get('/taskstatuses/edit', { name: 'taskstatuses#edit' }, async (req, reply) => {
       const allTaskStatuses = await app.orm.getRepository(TaskStatus).find();
       const couldNotBeDeletedStatuses = [...defaultStatuses];
       const defaultTaskStatuses = allTaskStatuses
@@ -12,7 +12,7 @@ export default (app) => {
       const taskStatuses = allTaskStatuses
         .filter((status) => !couldNotBeDeletedStatuses.includes(status.name));
       return reply.render(
-          'tasks/settings/index',
+          'tasks/taskstatuses/index',
           {
             taskStatuses,
             defaultTaskStatuses,
@@ -40,7 +40,7 @@ export default (app) => {
           await TaskStatus.create(newTaskStatus).save();
         }
 
-        return reply.redirect(app.reverse('taskstatuses#index'));
+        return reply.redirect(app.reverse('taskstatuses#edit'));
       }
     )
     .delete(
@@ -56,7 +56,7 @@ export default (app) => {
           i18next.t(`views.tasks.settings.newTaskStatus.success`)
         );
 
-        return reply.redirect(app.reverse('taskstatuses#index'));
+        return reply.redirect(app.reverse('taskstatuses#edit'));
       }
     );
 };

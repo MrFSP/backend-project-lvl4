@@ -47,9 +47,7 @@ const getTags = async (app, newTags) => {
 };
 
 export const filterTasks = async (app, filter) => {
-  const getTagsNames = () => filter.tags
-  .split(',')
-  .map(tagName => tagName.trim());
+  const getTagsNames = (tagsNames) => tagsNames.split(',').map((tagName) => tagName.trim());
 
   const query = [
     filter.status ? 'task.status = :status' : null,
@@ -66,7 +64,7 @@ export const filterTasks = async (app, filter) => {
       {
         status: filter.status,
         assignedTo: filter.assignedTo,
-        tagsNames: filter.tags ? getTagsNames() : null,
+        tagsNames: filter.tags ? getTagsNames(filter.tags) : null,
       }
     )
     .getMany();
@@ -133,8 +131,7 @@ export default (app) => {
       
       const task = await app.orm.getRepository(Task).findOne({ id: taskId })
 
-      const taskStatuses = allTaskStatuses
-        .filter((ts) => ts.name !== task.status)
+      const taskStatuses = allTaskStatuses.filter((ts) => ts.name !== task.status)
 
       return reply.render(
         'tasks/change',

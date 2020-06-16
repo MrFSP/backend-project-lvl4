@@ -97,7 +97,7 @@ describe('Testing task statuses CRUD in app', () => {
 
   it('Should get page "/taskstatuses"', async () => {
     const res = await request.agent(server.server)
-      .get('/taskstatuses')
+      .get('/taskstatuses/edit')
       .set('cookie', await getCookie(server, currUser))
       .catch((err) => {
         console.log(err);
