@@ -6,21 +6,6 @@ import TaskStatus from '../entity/TaskStatus.js';
 import Tag from '../entity/Tag.js';
 import _ from 'lodash';
 
-const getUsersFullnames = async (app) => {
-  const users = await app.orm
-        .getRepository(User)
-        .find();
-  return users.reduce((acc, user) => {
-    const value = [user.firstName || '',
-      user.lastName || '',
-      user.email,
-    ].join(' ').replace(/ +/g, ' ').trim();
-    user.fullName = value;
-    user.passwordDigest = ''
-    return { ...acc, [user.id]: user };
-  }, {});
-};
-
 const getTags = async (app, newTags) => {
   if (!newTags) {
     return;
@@ -80,7 +65,7 @@ export default (app) => {
         ? await filterTasks(app, filter)
         : await app.orm.getRepository(Task).find();
 
-      const users = await getUsersFullnames(app);
+      const users = await app.orm.getRepository(User).find();
 
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
       const tags = await app.orm.getRepository(Tag).find();
@@ -88,7 +73,7 @@ export default (app) => {
       return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })
     .get('/tasks/new', { name: 'tasks#new' }, async (req, reply) => {
-      const users = await getUsersFullnames(app);
+      const users = await app.orm.getRepository(User).find();
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
 
       return reply.render(
@@ -112,7 +97,7 @@ export default (app) => {
       const errors = await validate(newTask);
       if (!_.isEmpty(errors)) {
         req.flash('error', i18next.t('flash.tasks.create.error'));
-        const users = await getUsersFullnames(app);
+        const users = await app.orm.getRepository(User).find();
         const taskStatuses = await app.orm.getRepository(TaskStatus).find();
         return reply.render('/tasks/new', { users, taskStatuses, errors });
       }
@@ -125,7 +110,7 @@ export default (app) => {
     })
     .get('/tasks/:id/edit', { name: 'tasks#edit' }, async (req, reply) => {
       const taskId = req.params.id;
-      const users = await getUsersFullnames(app);
+      const users = await app.orm.getRepository(User).find();
       const allTaskStatuses = await app.orm.getRepository(TaskStatus).find();
       
       const task = await app.orm.getRepository(Task).findOne({ id: taskId })

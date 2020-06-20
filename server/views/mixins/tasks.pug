@@ -140,7 +140,7 @@ mixin selectAssignedTo(assignedTo)
           name='assignedTo[id]'
           value=`${assignedTo}`
           selected=''
-        )= t(`${users[assignedTo] ? users[assignedTo].fullName : ''}`)
+        ) !{users.find((user) => user.id == task.assignedTo).getFullName()}
       if !assignedTo
         option(
           selected=''
@@ -151,7 +151,7 @@ mixin selectAssignedTo(assignedTo)
           option.form-control(
             name='assignedTo[id]'
             value=user.id
-          )= t(`${user.fullName}`)
+          )= t(`${user.getFullName()}`)
 
 mixin btnTag(tag)
   button.btn.badge.badge-pill.badge-success.ml-1.mr-1(
@@ -190,7 +190,7 @@ mixin btnAssignedToFilter(task, users)
   button.h6.btn.btn-link.shadow-none.border-0.text-dark.my-0.py-0.ml-1.px-0(
     type='submit'
     form=`myTaskAssignedTo${task.assignedTo}`
-  ) !{users[task.assignedTo] ? users[task.assignedTo].fullName : ''}
+  ) !{users.find((user) => user.id == task.assignedTo).getFullName()}
     form(
       action=route('tasks#index')
       method='get'
@@ -254,7 +254,7 @@ mixin taskCard(task)
               .card-body.pb-1
                 .d-flex.justify-content-end
                   h6= t('views.tasks.tasks.author')
-                  h6 : !{users[task.creator] ? users[task.creator].fullName : ''}
+                  h6 : !{users.find((user) => user.id == task.creator).getFullName()}
 
 mixin filterByUser(users)
   .form-group.col-md-4.mb-2
@@ -267,7 +267,7 @@ mixin filterByUser(users)
       each user in Object.values(users)
         option.form-control(
           value=user.id
-        )= t(`${user.fullName}`)
+        )= t(`${user.getFullName()}`)
 
 
 mixin filterByTaskStatus(taskStatuses)
@@ -289,13 +289,3 @@ mixin filterByTag(tags)
       name='tags'
       placeholder='Введите теги'
     )
-    //- select.form-control(name='tags')
-    //-   option.form-control(
-    //-     selected=''
-    //-     disabled=''
-    //-     value=''
-    //-   )= t('views.tasks.tasks.tag')
-    //-   each tag in tags
-    //-     option.form-control(
-    //-       value=tag.id
-    //-     )= t(`${tag.name}`)

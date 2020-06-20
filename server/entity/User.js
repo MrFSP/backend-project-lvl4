@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
 import { IsNotEmpty, IsEmail } from 'class-validator';
+import _ from 'lodash';
 
 @Entity()
 class User extends BaseEntity {
@@ -24,6 +25,14 @@ class User extends BaseEntity {
   @Column('varchar')
   @IsNotEmpty()
   passwordDigest = '';
+
+  getFullName () {
+    const email = this.email;
+    const firstName = this.firstName || '';
+    const lastName = this.lastName || '';
+    return _.join([firstName, lastName, email], ' ');
+  }
+
 }
 
 export default User;
