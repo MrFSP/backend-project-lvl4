@@ -73,7 +73,23 @@ describe('Testing task statuses CRUD in app', () => {
     expect(status.name).toEqual(newTaskStatus.name);
   });
 
-  it('Should not set new task status', async () => {
+  it("Should not set new task status when task's status name exists", async () => {
+
+    const res = await request.agent(server.server)
+      .post('/taskstatuses')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ newTaskStatus: newTaskStatus })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const statuses = await TaskStatus.find();
+
+    expect(res).toHaveHTTPStatus(302);
+    expect(statuses.length).toBe(1);
+  });
+
+  it('Should not set new task status when name is empty', async () => {
 
     const res = await request.agent(server.server)
       .post('/taskstatuses')
