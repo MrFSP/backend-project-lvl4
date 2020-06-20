@@ -17,7 +17,6 @@ const currUser = {
 };
 
 const newTaskStatus = { name: faker.lorem.word() };
-const taskStatusForDeleting = { name: faker.lorem.word() };
 
 const getCookie = async (server, user) => {
   const res = await request.agent(server.server)
@@ -44,6 +43,14 @@ describe('Testing task statuses CRUD in app', () => {
       .catch((err) => {
         console.log(err);
       });
+
+    await request.agent(server.server)
+      .post('/taskstatuses')
+      .set('cookie', await getCookie(server, currUser))
+      .send({ newTaskStatus: defaultStatuses[0] })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 
   beforeEach(async () => {
@@ -51,7 +58,7 @@ describe('Testing task statuses CRUD in app', () => {
   });
 
   it('Should set new task status', async () => {
-    const successResponse1 = await request.agent(server.server)
+    const res = await request.agent(server.server)
       .post('/taskstatuses')
       .set('cookie', await getCookie(server, currUser))
       .send({ newTaskStatus: newTaskStatus })
@@ -59,23 +66,16 @@ describe('Testing task statuses CRUD in app', () => {
         console.log(err);
       });
 
-    const successResponse2 = await request.agent(server.server)
-      .post('/taskstatuses')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTaskStatus: defaultStatuses[0] })
-      .catch((err) => {
-        console.log(err);
-      });
+    const status = await TaskStatus
+      .findOne({ where: { name: newTaskStatus.name }});
 
-    const successResponse3 = await request.agent(server.server)
-      .post('/taskstatuses')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTaskStatus: newTaskStatus })
-      .catch((err) => {
-        console.log(err);
-      });
+    expect(res).toHaveHTTPStatus(302);
+    expect(status.name).toEqual(newTaskStatus.name);
+  });
 
-    const successResponse4 = await request.agent(server.server)
+  it('Should not set new task status', async () => {
+
+    const res = await request.agent(server.server)
       .post('/taskstatuses')
       .set('cookie', await getCookie(server, currUser))
       .send({ newTaskStatus: { name: '' } })
@@ -84,15 +84,9 @@ describe('Testing task statuses CRUD in app', () => {
       });
 
     const statuses = await TaskStatus.find();
-    const status = await TaskStatus
-      .findOne({ where: { name: newTaskStatus.name }});
 
-    expect(successResponse1).toHaveHTTPStatus(302);
-    expect(successResponse2).toHaveHTTPStatus(302);
-    expect(successResponse3).toHaveHTTPStatus(302);
-    expect(successResponse4).toHaveHTTPStatus(302);
+    expect(res).toHaveHTTPStatus(302);
     expect(statuses.length).toBe(1);
-    expect(status.name).toEqual(newTaskStatus.name);
   });
 
   it('Should get page "/taskstatuses"', async () => {
@@ -107,18 +101,10 @@ describe('Testing task statuses CRUD in app', () => {
   });
 
   it('Should delete task status', async () => {
-    await request.agent(server.server)
-      .post('/taskstatuses')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ newTaskStatus: taskStatusForDeleting })
-      .catch((err) => {
-        console.log(err);
-      });
-
     const statusBeforeDeleting = await TaskStatus
-      .findOne({ where: { name: taskStatusForDeleting.name } });
+      .findOne({ where: { name: newTaskStatus.name } });
 
-    expect(statusBeforeDeleting.name).toEqual(taskStatusForDeleting.name);
+    expect(statusBeforeDeleting.name).toEqual(newTaskStatus.name);
 
     await request.agent(server.server)
       .delete(`/taskstatuses/${statusBeforeDeleting.id}`)
@@ -130,9 +116,9 @@ describe('Testing task statuses CRUD in app', () => {
 
     const statuses = await TaskStatus.find();
     const status = await TaskStatus
-      .findOne({ where: { name: taskStatusForDeleting.name } });
+      .findOne({ where: { name: newTaskStatus.name } });
     
-    expect(statuses.length).toBe(1);
+    expect(statuses.length).toBe(0);
     expect(status).toBe(undefined);
   });
 
