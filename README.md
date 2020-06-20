@@ -1,4 +1,5 @@
 [![Node CI](https://github.com/MrFSP/backend-project-lvl4/workflows/Node%20CI/badge.svg)](https://github.com/MrFSP/backend-project-lvl4/actions)
+[![Maintainability](https://api.codeclimate.com/v1/badges/2c9cb09174a79e2db8cb/maintainability)](https://codeclimate.com/github/MrFSP/backend-project-lvl4/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/2c9cb09174a79e2db8cb/test_coverage)](https://codeclimate.com/github/MrFSP/backend-project-lvl4/test_coverage)
 
 ## [Проект Менеджер задач](https://ru.hexlet.io/professions/backend/projects/6) / [Профессия Бэкенд JavaScript (node.js)](https://ru.hexlet.io/professions/backend)
