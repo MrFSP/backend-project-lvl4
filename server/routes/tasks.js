@@ -7,10 +7,10 @@ import Tag from '../entity/Tag.js';
 import _ from 'lodash';
 
 const getUsersFullnames = async (app) => {
-  const usersFromDB = await app.orm
+  const users = await app.orm
         .getRepository(User)
         .find();
-  return usersFromDB.reduce((acc, user) => {
+  return users.reduce((acc, user) => {
     const value = [user.firstName || '',
       user.lastName || '',
       user.email,
@@ -25,9 +25,8 @@ const getTags = async (app, newTags) => {
   if (!newTags) {
     return;
   }
-  const tags = await newTags
-    .split(',')
-    .map(tagName => tagName.trim())
+  const tags = await _.words(newTags)
+    .map(tagName => _.capitalize(tagName))
     .map(async (tagName) => {
       const tag = new Tag();
       tag.name = tagName;
@@ -47,7 +46,7 @@ const getTags = async (app, newTags) => {
 };
 
 const filterTasks = async (app, filter) => {
-  const getTagsNames = (tagsNames) => tagsNames.replace(',', '').split(' ').filter((i) => i !== ' ').map(tagName => _.capitalize(tagName.trim()));
+  const getTagsNames = (tagsNames) => _.words(tagsNames).map(tagName => _.capitalize(tagName));
 
   const query = [
     filter.status ? 'task.status = :status' : null,

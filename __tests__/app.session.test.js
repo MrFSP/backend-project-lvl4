@@ -111,6 +111,13 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
+    const taskFromDB = await Task.findOne({ where: { name: newTask.name } });
+
+    expect(taskFromDB.description).toEqual(newTask.description);
+    expect(taskFromDB.status).toEqual(newTask.status);
+  });
+
+  it('Should not create new task whit empty task name', async () => {
     await request.agent(server.server)
       .post('/tasks')
       .set('cookie', await getCookie(server, currUser))
@@ -119,6 +126,12 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
+    const tasks = await Task.find();
+
+    expect(tasks.length).toBe(1);
+  });
+
+  it('Should not create new task whit empty task status', async () => {
     await request.agent(server.server)
       .post('/tasks')
       .set('cookie', await getCookie(server, currUser))
@@ -128,10 +141,7 @@ describe('Testing changes in app', () => {
       });
 
     const tasks = await Task.find();
-    const taskFromDB = await Task.findOne({ where: { name: newTask.name } });
 
-    expect(taskFromDB.description).toEqual(newTask.description);
-    expect(taskFromDB.status).toEqual(newTask.status);
     expect(tasks.length).toBe(1);
   });
 
@@ -159,31 +169,35 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
-    const res = await request.agent(server.server)
-      .patch(`/tasks/${newTaskFromDB.id}`)
-      .set('cookie', await getCookie(server, currUser))
-      .send({ task: newTaskWithEmptyName })
-      .catch((err) => {
-        console.log(err);
-      });
-
     const changedTaskFromDB = await Task
       .findOne({ where: { name: changedNewTask.name } });
 
-    expect(changedTaskFromDB.description).toEqual(changedNewTask.description);
     expect(newTaskFromDB.id).toEqual(changedTaskFromDB.id);
+    expect(changedTaskFromDB.description).toEqual(changedNewTask.description);
+  });
+  
+  it("Should not change task when task's name is empty", async () => {
+    const taskFromDB = await Task
+      .findOne({ where: { name: changedNewTask.name } });
+    
+    const res = await request.agent(server.server)
+    .patch(`/tasks/${taskFromDB.id}`)
+    .set('cookie', await getCookie(server, currUser))
+    .send({ task: newTaskWithEmptyName })
+    .catch((err) => {
+      console.log(err);
+    });
+    
+    const notChangedTaskFromDB = await Task
+      .findOne({ where: { name: changedNewTask.name } });
+    
+    expect(taskFromDB.id).toEqual(notChangedTaskFromDB.id);
+    expect(notChangedTaskFromDB.name).toEqual(changedNewTask.name);
+    expect(notChangedTaskFromDB.description).toEqual(changedNewTask.description);
     expect(res).toHaveHTTPStatus(302);
   });
 
   it('Should get filtered task', async () => {
-    await request.agent(server.server)
-      .post('/tasks')
-      .set('cookie', await getCookie(server, currUser))
-      .send({ task: newTask, newTags: tagsForNewTask })
-      .catch((err) => {
-        console.log(err);
-      });
-
     const res = await request.agent(server.server)
       .get('/tasks')
       .set('cookie', await getCookie(server, currUser))
@@ -198,17 +212,14 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
-    console.log('resresres');
-    console.log(res);
-
     expect(res).toHaveHTTPStatus(200);
   });
 
-  it('Should not change password', async () => {
+  it('Should not change password when old password is wrong', async () => {
     const userFromDbBeforeRequest = await User
       .findOne({ where: { email: currUser.email } });
 
-    const res1 = await request.agent(server.server)
+    const res = await request.agent(server.server)
       .post(`/users/${userFromDbBeforeRequest.id}/password`)
       .set('cookie', await getCookie(server, currUser))
       .send({
@@ -222,7 +233,19 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
-    const res2 = await request.agent(server.server)
+    const userFromDbAfterRequest = await User
+      .findOne({ where: { email: currUser.email } });
+
+    expect(userFromDbBeforeRequest.passwordDigest)
+      .toEqual(userFromDbAfterRequest.passwordDigest);
+    expect(res).toHaveHTTPStatus(302);
+  });
+
+  it('Should not change password when new password is not confirms', async () => {
+    const userFromDbBeforeRequest = await User
+      .findOne({ where: { email: currUser.email } });
+
+    const res = await request.agent(server.server)
       .post(`/users/${userFromDbBeforeRequest.id}/password`)
       .set('cookie', await getCookie(server, currUser))
       .send({
@@ -241,8 +264,7 @@ describe('Testing changes in app', () => {
 
     expect(userFromDbBeforeRequest.passwordDigest)
       .toEqual(userFromDbAfterRequest.passwordDigest);
-    expect(res1).toHaveHTTPStatus(302);
-    expect(res2).toHaveHTTPStatus(302);
+    expect(res).toHaveHTTPStatus(302);
   });
 
   it("User's password should be changed", async () => {
@@ -255,20 +277,6 @@ describe('Testing changes in app', () => {
       .send({
         object: {
           oldPass: currUser.password,
-          newPass: changedUser.password,
-          confirmNewPass: changedUser.password,
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await request.agent(server.server)
-      .post(`/users/${userFromDbBeforeRequest.id}/password`)
-      .set('cookie', await getCookie(server, currUser))
-      .send({
-        object: {
-          oldPass: 'wrongPassword',
           newPass: changedUser.password,
           confirmNewPass: changedUser.password,
         }
@@ -326,7 +334,8 @@ describe('Testing changes in app', () => {
         console.log(err);
       });
 
-    const taskForDeletingFromDb = await Task.findOne({ where: { name: taskForDeleting.name } });
+    const taskForDeletingFromDb = await Task
+      .findOne({ where: { name: taskForDeleting.name } });
     const isTaskForDeletingExistsBeforeDelQuery = taskForDeletingFromDb
       ? true
       : false;

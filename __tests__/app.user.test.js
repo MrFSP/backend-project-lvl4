@@ -60,6 +60,13 @@ describe('Testing responses for Guest', () => {
     expect(res3).toHaveHTTPStatus(200);
   });
 
+  it('should return 302', async () => {
+    const res = await request.agent(server.server)
+      .get('/users/user');
+
+  expect(res).toHaveHTTPStatus(302);
+  });
+
   afterAll(async () => {
     await server.close();
     await fs.unlink(path.join(__dirname, 'database.sqlite')).catch(_.noop);
