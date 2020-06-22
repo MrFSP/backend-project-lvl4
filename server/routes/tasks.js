@@ -43,6 +43,7 @@ const filterTasks = async (app, filter) => {
   const tasks = await app.orm
     .createQueryBuilder(Task, 'task')
     .leftJoinAndSelect('task.tags', 'tag')
+    .leftJoinAndSelect('task.creator', 'creator')
     .where(
       query,
       {
@@ -69,6 +70,10 @@ export default (app) => {
 
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
       const tags = await app.orm.getRepository(Tag).find();
+
+      console.log('tasks');
+      console.log(tasks);
+      console.log(tasks[0].creator);
 
       return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })

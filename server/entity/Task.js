@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany, JoinTable, OneToOne, JoinColumn } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
 import Tag from './Tag';
+import User from './User';
 
 @Entity()
 class Task extends BaseEntity {
@@ -18,9 +19,10 @@ class Task extends BaseEntity {
   @IsNotEmpty()
   status = '';
 
-  @Column('varchar')
+  @OneToOne(() => User)
+  @JoinColumn()
   @IsNotEmpty()
-  creator = '';
+  creator = Promise;
 
   @Column('varchar')
   assignedTo = '';
