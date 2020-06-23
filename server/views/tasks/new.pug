@@ -1,0 +1,29 @@
+extends ../layouts/application.pug
+include ../mixins/tasks.pug
+
+block content
+  .container.col-6.justify-content-center
+    h3.mb-3.font-weight-normal.text-center= t('views.tasks.new.title')
+    form#task(
+      action=route('tasks#create')
+      method='post'
+    )
+      +inputTaskName()
+      +selectTaskStatus()
+      +inputTags()
+      .form-group
+        textarea.form-control(
+                  name='task[description]'
+                  rows="6"
+                  placeholder= t('views.tasks.new.description')
+                  )
+      +selectAssignedTo()
+    hr
+    .d-flex.justify-content-between
+      a.btn.btn-link.shadow-none.border-0(
+                href=route('tasks#index'),
+                method='get',
+              )= t('views.tasks.settings.back')
+      button.btn.btn-link.shadow-none.border-0(
+                form='task'
+              )= t('views.tasks.new.create')

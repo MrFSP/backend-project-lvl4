@@ -1,0 +1,142 @@
+mixin formFor(entity = null)
+  form.form-signin()&attributes(attributes)
+    block
+
+mixin input(entity, propertyName, errors = [])
+  - error = errors.find((error) => error.property === propertyName)
+  .form-label-group(class=(errors[propertyName] && 'has-danger'))
+    label.mt-2(for=propertyName)= propertyName
+    input(
+      name=getInputName(entity, propertyName)
+      class='form-control'
+      id=propertyName
+      placeholder=propertyName
+      value=_.get(entity, propertyName, '')
+      required=''
+      autofocus=''
+    )&attributes(attributes)
+    if error
+      .form-control-feedback= Object.values(error.constraints).join('. ')
+
+mixin formToChangeUserData(entity = null)
+  form&attributes(attributes)
+    block
+
+mixin inputToChangeUserData(entity, propertyName, errors = [])
+  - error = errors.find((error) => error.property === propertyName)
+  .form-group(class=(errors[propertyName] && 'has-danger'))
+    label=t(`views.user.${propertyName}`)
+    input.text-center(
+      name=getInputName(entity, propertyName)
+      class='form-control'
+      value=_.get(entity, propertyName, '')
+    )&attributes(attributes)
+    if error
+      .form-control-feedback= Object.values(error.constraints).join('. ')
+
+mixin inputToChangePass(entity, propertyName, errors = [])
+  - error = errors.find((error) => error.property === propertyName)
+  .form-group(class=(errors[propertyName] && 'has-danger'))
+    label=t(`views.user.password.${propertyName}`)
+    input.text-center(
+      name=getInputName(entity, propertyName)
+      class='form-control'
+      type='password'
+      onfocus='this.removeAttribute("readonly");'
+      readonly autocomplete='off'
+    )&attributes(attributes)
+    if error
+      .form-control-feedback= Object.values(error.constraints).join('. ')
+
+mixin submit(form = null)
+  .form-group
+    input.btn.btn-lg.btn-outline-primary.btn-block(type='submit')&attributes(attributes)
+
+mixin submitUpdate(form = null)
+  input.btn.btn-outline-primary(type='submit')&attributes(attributes)
+
+mixin buttonTo(action, method)
+  form(action=action, method="post")
+    input(name="_method" type="hidden" value=method)
+    input(type='submit')&attributes(attributes)
+
+mixin changePassword(pass)
+  button.btn.btn-link(
+                    type='button'
+                    data-toggle='modal'
+                    data-target='#changePass'
+                  )= t('views.user.password.chPass')
+  #changePass.modal.fade(
+                    tabindex='-1'
+                    role='dialog'
+                    aria-labelledby='changePassLabel'
+                    aria-hidden='true'
+                  ) 
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          .container
+            h5#changePassLabel.modal-title.text-center= t('views.user.password.chPassTitle')
+        .modal-body
+          .justify-content-center
+            +formToChangeUserData()(action=route('userUpdate') method='post')
+              each key in passKeys
+                +inputToChangePass(pass, key)
+              .container.justify-content-right
+                button.btn.btn-link(
+                          type='button'
+                          data-dismiss='modal'
+                        )= t('views.user.password.back')
+                +buttonTo(
+                      route('userUpdate'),
+                      'post'
+                    )(class="btn btn-link" value=t('views.user.password.confirmChange'))
+
+mixin buttonDeleteUser()
+  button.btn.btn-outline-danger(
+                    type='button'
+                    data-toggle='modal'
+                    data-target='#deleteUser'
+                  )= t('views.user.delete.delete')
+  #deleteUser.modal.fade(
+                    tabindex='-1'
+                    role='dialog'
+                    aria-labelledby='deleteUserLabel'
+                    aria-hidden='true') 
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          .container
+            h5#deleteUserLabel.modal-title.text-center= t('views.user.delete.deleteTitle')
+        .modal-body= t('views.user.delete.deleteMessage')
+        .modal-footer.justify-content-between
+          button.btn.btn-primary(
+            type='button'
+            data-dismiss='modal'
+          )= t('views.user.delete.save')
+          form(
+            action=`/users/${currUserId}`
+            method='post'
+          )
+            input(
+              name="_method"
+              type="hidden"
+              value='DELETE'
+            )
+            button.btn.btn-danger(
+              type='submit'
+            )=t('views.user.delete.confirmDelete')
+
+mixin changeProp(route, properties, nameOfNewProp)
+  form#settings(action=route(route) method='post')
+    .form-group
+      .text-center
+        h5 Теги
+          each item in properties
+            h6= t(`${item.name}`)
+      label(for='formControlInput')= t(`tasks.settings.${nameOfNewProp}`)
+      input#formControlInput.form-control(name=`${nameOfNewProp}[name]` autocomplete='off')
+  .d-flex.justify-content-right
+    button.btn.btn-link(
+              form='settings'
+            )= t('tasks.settings.add')

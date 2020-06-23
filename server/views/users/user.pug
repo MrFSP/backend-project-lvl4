@@ -1,0 +1,24 @@
+extends ../layouts/application.pug
+
+block content
+  .container.col-4.justify-content-center
+    .d-flex.flex-column
+      h3.mb-3.font-weight-normal.text-center Данные пользователя
+      +formToChangeUserData()(
+        action=`/users/${currUserId}`
+        method='post'
+      )
+        input(
+          name="_method"
+          type="hidden"
+          value='patch'
+        )
+        each key in keys
+          +inputToChangeUserData(user, key)(type='!{key}')
+        .d-flex.flex-column.pt-3.pb-3
+          +submitUpdate(user)(value=t('views.user.update'))
+      a.btn.btn-outline-info.mb-3(
+        href=`/users/${currUserId}/password`,
+        method='get'
+      )=t('views.user.password.chPass')
+      +buttonDeleteUser()

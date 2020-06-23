@@ -1,0 +1,72 @@
+include ../mixins/helpers.pug
+include ../mixins/forms.pug
+
+doctype html
+html(lang="en").h-100.pt-4
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    meta(name='author' content='Pavel Egorov')
+    meta(name='generator' content='Jekyll v3.8.5')
+    title Task Manager
+    script(src=assetPath('main.js'))
+    link(href=assetPath('main.css') rel='stylesheet')
+  body.h-100
+    nav.navbar.navbar-expand-md.fixed-top.border-bottom.navbar-light.bg-light.mb-3
+      a.navbar-brand(href=route('root'))= t('appName')
+      button.navbar-toggler(data-toggle="collapse" data-target="#navbarSupportedContent")
+        span.navbar-toggler-icon
+      #navbarSupportedContent.collapse.navbar-collapse
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(
+              href=route('users#index')
+            )= t('layouts.application.users')
+        ul.navbar-nav
+          if reply.request.signedIn
+            li.nav-item
+              a.nav-link(
+                href=`/users/${currUserId}/edit`
+              ) !{reply.request.session.get('userEmail')}
+            li.nav-item
+              +buttonTo(
+                route('session'),
+                'delete'
+                )(
+                class="btn nav-link"
+                value=t('layouts.application.signOut')
+              )
+          else
+            li.nav-item
+              a.nav-link(
+                href=route('newSession')
+              )= t('layouts.application.signIn')
+            li.nav-item
+              a.nav-link(
+                href=route('users#new')
+              )= t('layouts.application.signUp')
+    .container.mt-4.pt-4
+
+      each messages, type in reply.flash() || []
+        each message in messages
+          .animated.fadeOutUp
+            .d-flex.justify-content-center.mt-2.mb-0.pb-0
+              .row.col-md-auto.alert.text-center.w-auto.mb-0(class=`alert-${getAlertClass(type)}`)= message
+                button.close.pl-2.pr-0(
+                  type='button'
+                  data-dismiss='alert'
+                )
+                  span(aria-hidden='true') &times;
+                  span.sr-only Close
+
+      h1.my-4.text-center
+        block header
+      block content
+
+    footer.footer.navbar.bg-light.border-top.fixed-bottom.pt-0.mt-0.justify-content-center
+      .d-flex.pb-3.pt-3
+        a(href='https://ru.hexlet.io/u/mrfsp') Pavel Egorov
+        a.ml-1 &copy; 2020
+        a.ml-1(target="_blank" href="https://ru.hexlet.io") hexlet.io
+
+    .container.mt-5.pt-5

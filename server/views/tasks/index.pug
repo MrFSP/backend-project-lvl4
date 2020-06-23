@@ -1,0 +1,50 @@
+extends ../layouts/application.pug
+include ../mixins/tasks.pug
+
+block content
+  .container.col-10.justify-content-center
+    .row.justify-content-center
+      a.btn.shadow-none.border-0.mb-0(
+        href=route('tasks#index')
+      )
+        .h3= t('views.tasks.tasks.title')
+    .row.justify-content-between
+      a.nav-link(
+        href=route('tasks#new')
+      )= t('views.tasks.new.create')
+      button.btn.btn-link.shadow-none.border-0.mr-5.pr-3(
+        type='submit'
+        form='myTask'
+      )= t('views.tasks.tasks.myTasks')
+        form(
+          action=route('tasks#index')
+          method='get'
+          id='myTask'
+        )
+          input(
+            name='assignedTo'
+            value=reply.request.session.get('userId')
+            type='hidden'
+          )
+      .btn.btn-link.shadow-none.border-0.collapsed(
+        data-toggle='collapse'
+        data-target='#collapseForm'
+        aria-expanded='false'
+        aria-controls='collapseForm'
+      )= t('views.tasks.tasks.filters')
+    #collapseForm.collapse.pb-2
+      .col
+        form.row(
+          action=route('tasks#index')
+          method='get'
+          id='filterForm'
+        )
+          +filterByUser(users)
+          +filterByTaskStatus(taskStatuses)
+          +filterByTag(tags)
+        .row.justify-content-end
+          button.btn.btn-outline-primary.mb-1.mr-3(
+              form='filterForm',
+            )= t('views.tasks.tasks.apply')
+    each task in tasks
+      +taskCard(task)

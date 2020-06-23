@@ -1,0 +1,292 @@
+mixin list(items, type)
+  each item in items
+    .col.justify-content-center
+      a#navbarDropdown.nav-link.dropdown-toggle.text-dark(
+        href='#'
+        role='button'
+        data-toggle='dropdown'
+        aria-haspopup='true'
+        aria-expanded='false'
+      ) !{item.name}
+      .dropdown-menu.text-center.py-1(aria-labelledby='dropdownMenuButton')
+        button.btn.btn-link.btn-sm.shadow-none.border-0.text-danger(
+          type='submit'
+          form=`formForDeleteItem${item.name}`
+          onclick="return confirm('Вы уверены?')"
+        )= t('views.tasks.tasks.delete')
+        form(
+          action=`/taskstatuses/${item.id}`
+          method='post'
+          id=`formForDeleteItem${item.name}`
+        )
+          input(
+            name="_method"
+            type="hidden"
+            value='delete'
+          )
+
+mixin defaultlist(items)
+  each item in items
+    .d-flex.justify-content-center
+      a.nav-link.pl-3.text-dark !{item.name}
+
+mixin settingForm(properties, type)
+  form.mt-3(
+    action=route('taskstatuses#create')
+    method='post'
+    id=`settings${type}`
+  )
+    .form-group
+      label(
+        for='formControlInput'
+      )= t(`views.tasks.settings.${type}.add`)
+      input#formControlInput.form-control(
+        name=`${type}[name]`
+        autocomplete='off'
+      )
+  .d-flex
+    button.btn.btn-block.btn-outline-primary(
+              form=`settings${type}`
+            )= t('views.tasks.settings.add')
+
+//- mixins for
+
+mixin inputTaskName(taskName = '')
+  .form-group
+    label(
+      for='FormControlInputTaskName'
+    )= t('views.tasks.change.taskName')
+    input#FormControlInputTaskName.form-control.data-bv-notempty-message(
+      name='task[name]'
+      autocomplete='off'
+      value=`${taskName || ''}`
+    )
+
+mixin selectTaskStatus(taskStatus)
+  .form-group.col.mb-3.pl-0
+    .row.ml-0
+      label(
+        for='inlineFormCustomSelect'
+      )= t('views.tasks.change.status')
+      if !taskStatus
+        a.h6.btn-link.ml-4.mt-1.mb-1(
+          href=route('taskstatuses#edit'),
+          method='get',
+        )= t('views.tasks.settings.edit')
+    select#inlineFormCustomSelect.flex-row.w-auto.form-control(
+      name='task[status]'
+    )
+      if taskStatus
+        option.form-control(
+          value=taskStatus
+          selected=''
+        )= t(`${taskStatus}`)
+      each taskStatus in taskStatuses
+        option.form-control(
+          value=taskStatus.name
+        )= t(`${taskStatus.name}`)
+
+mixin selectedTags(tags)
+  each tag in tags
+    .form-check.ml-2
+      input.form-check-input(
+        type='checkbox'
+        id=`${tag.name}`
+        name='tagsForTask[name]'
+        value=tag.name
+        checked=''
+      )
+      label.form-check-label(
+        for=`${tag.name}`
+      )= t(`${tag.name}`)
+
+mixin btnTagDelete(tag)
+  button.btn.badge.badge-pill.badge-success.ml-1.mr-1.my-2(
+    type='submit'
+    form=`myTaskTag${tag.name}`
+  ) !{tag.name}
+    form(
+      action=route('tasks#index')
+      method='post'
+      id=`myTaskTag${tag.name}`
+    )
+      input(
+        name='filter[tag]'
+        value=tag.id
+        type='hidden'
+      )
+
+mixin inputTags(taskTags)
+  .form-group
+    .row.justify-content-between.mx-0
+      label.mt-1(
+        for='FormControlInputTags'
+      )= t('views.tasks.settings.tags')
+    input#FormControlInputTags.form-control.data-bv-notempty-message(
+      name='newTags'
+      autocomplete='off'
+      placeholder= t('views.tasks.new.tag')
+      value=t(taskTags ? joinTags(taskTags) : '')
+    )
+
+mixin selectAssignedTo(assignedTo)
+  .form-group
+    select#inlineFormCustomSelect.w-100.form-control(
+      name='task[assignedTo]'
+      required=''
+    )
+      if assignedTo
+        option.form-control(
+          name='assignedTo[id]'
+          value=assignedTo.id
+          selected=''
+        ) !{assignedTo.getFullName()}
+      if !assignedTo
+        option(
+          selected=''
+          disabled=''
+        )= t('views.tasks.change.assignedto')
+      each user in users
+        if user.id != (assignedTo ? assignedTo.id : null)
+          option.form-control(
+            name='assignedTo[id]'
+            value=user.id
+          )= t(`${user.getFullName()}`)
+
+mixin btnTag(tag)
+  button.btn.badge.badge-pill.badge-success.ml-1.mr-1(
+    type='submit'
+    form=`myTaskTag${tag.name}`
+  ) !{tag.name}
+    form(
+      action=route('tasks#index')
+      method='get'
+      id=`myTaskTag${tag.name}`
+    )
+      input(
+        name='tags'
+        value=tag.name
+        type='hidden'
+      )
+
+mixin btnTaskStatus(task)
+  if task.status
+    button.btn.badge.badge-primary.ml-1.mr-1()(
+      type='submit'
+      form=`myTaskStatus${task.status}`
+    ) !{task.status}
+      form(
+        action=route('tasks#index')
+        method='get'
+        id=`myTaskStatus${task.status}`
+      )
+        input(
+          name='status'
+          value=task.status
+          type='hidden'
+        )
+
+mixin btnAssignedToFilter(task, users)
+  button.h6.btn.btn-link.shadow-none.border-0.text-dark.my-0.py-0.ml-1.px-0(
+    type='submit'
+    form=`myTaskAssignedTo${task.assignedTo.id}`
+  ) !{task.assignedTo.getFullName()}
+    form(
+      action=route('tasks#index')
+      method='get'
+      id=`myTaskAssignedTo${task.assignedTo.id}`
+    )
+      input(
+        name='assignedTo'
+        value=task.assignedTo.id
+        type='hidden'
+      )
+
+mixin taskCard(task)
+  div(id=`accordion${task.id}`)
+          .card
+            .card-header.row.ml-0.mr-0.pt-0.pb-1.justify-content-between(
+              id=`heading${task.id}`
+            )
+              .col.ml-0.mr-0
+                .row
+                  .mb-0
+                    .btn.btn-link.shadow-none.border-0.collapsed(
+                      data-toggle='collapse'
+                      data-target=`#collapse${task.id}`
+                      aria-expanded='false'
+                      aria-controls=`collapse${task.id}`
+                    )= t(task.name)
+                  span.d-flex.align-items-center
+                    +btnTaskStatus(task)
+                .d-flex.align-items-center
+                  h6.ml-0.my-0= t('views.tasks.tasks.assignedTo')
+                  if task.assignedTo
+                    +btnAssignedToFilter(task, users)
+              .row.ml-0.mr-0
+                span.d-flex.align-items-top.mt-1
+                  .col
+                    if task.tags
+                      each tag in task.tags
+                        +btnTag(tag)
+                .col
+                  a.btn.btn-link.btn-sm.shadow-none.border-0.text-primary.mt-1(
+                    href=`/tasks/${task.id}/edit`
+                  )= t('views.tasks.tasks.change')
+                  form(
+                    action=`/tasks/${task.id}`
+                    method='post'
+                  )
+                    input(
+                      name="_method"
+                      type="hidden"
+                      value='delete'
+                    )
+                    button.btn.btn-link.btn-sm.shadow-none.border-0.text-danger(
+                      type='submit'
+                      onclick="return confirm('Вы уверены что хотите удалить задачу?')"
+                    )= t('views.tasks.tasks.delete')
+            .collapse(
+              aria-labelledby=`heading${task.id}`
+              data-parent=`#accordion${task.id}`
+              id=`collapse${task.id}`
+            )
+              .card-body.mt-0.pt-2.p.pb-0.ml-3.pl-3 !{task.description}
+              .card-body.pb-1
+                .d-flex.justify-content-end
+                  h6= t('views.tasks.tasks.author')
+                  h6 : !{task.creator ? task.creator.getFullName() : ''}
+
+mixin filterByUser(users)
+  .form-group.col-md-4.mb-2
+    select.form-control(name='assignedTo')
+      option.form-control(
+        selected=''
+        disabled=''
+        value=''
+      )= t('views.tasks.tasks.assignedTo')
+      each user in Object.values(users)
+        option.form-control(
+          value=user.id
+        )= t(`${user.getFullName()}`)
+
+
+mixin filterByTaskStatus(taskStatuses)
+  .form-group.col-md-4.mb-2
+    select.form-control(name='status')
+      option.form-control(
+        selected=''
+        disabled=''
+        value=''
+      )= t('views.tasks.change.status')
+      each taskStatus in taskStatuses
+        option.form-control(
+          value=taskStatus.name
+        )= t(`${taskStatus.name}`)
+
+mixin filterByTag(tags)
+  .form-group.col-md-4.mb-2
+    input.form-control(
+      name='tags'
+      placeholder='Введите теги'
+    )
