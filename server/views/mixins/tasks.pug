@@ -255,7 +255,7 @@ mixin taskCard(task)
               .card-body.pb-1
                 .d-flex.justify-content-end
                   h6= t('views.tasks.tasks.author')
-                  h6 : !{task.creator.getFullName()}
+                  h6 : !{task.creator ? task.creator.getFullName() : ''}
 
 mixin filterByUser(users)
   .form-group.col-md-4.mb-2
