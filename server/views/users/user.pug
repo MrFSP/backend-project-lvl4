@@ -5,7 +5,7 @@ block content
     .d-flex.flex-column
       h3.mb-3.font-weight-normal.text-center Данные пользователя
       +formToChangeUserData()(
-        action=`/users/${currUserId}/edit`
+        action=`/users/${currUserId}`
         method='post'
       )
         input(

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany, JoinTable, ManyToOne } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
 import Tag from './Tag';
+import User from './User';
 
 @Entity()
 class Task extends BaseEntity {
@@ -18,12 +19,19 @@ class Task extends BaseEntity {
   @IsNotEmpty()
   status = '';
 
-  @Column('varchar')
-  @IsNotEmpty()
-  creator = '';
+  @ManyToOne(
+    () => User,
+    user => user.tasksOwner,
+    { eager: true, cascade: true }
+  )
+  creator = Promise;
 
-  @Column('varchar')
-  assignedTo = '';
+  @ManyToOne(
+    () => User,
+    user => user.tasksExecutor,
+    { eager: true, cascade: true }
+  )
+  assignedTo = Promise;
 
   @ManyToMany(
     () => Tag,

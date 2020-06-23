@@ -1,7 +1,5 @@
 - const getInputName = (entity, property) => `${entity.constructor.name.toLowerCase()}[${property}]`
 
-- const getURL = (routeName, id) => routeName.replace(':id', id)
-
 - const currUserId = reply.request.session.get('userId')
 
 - const joinTags = (tags) => tags.map((tag) => tag.name).join(', ')

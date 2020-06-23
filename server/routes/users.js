@@ -23,6 +23,8 @@ export default (app) => {
       const user = User.create(req.body.user);
       const password = req.body.user.password;
       user.passwordDigest = encrypt(password);
+      user.tasksCreator = null;
+      user.tasksExecutor = null;
 
       const errors = await validate(user);
       if (!_.isEmpty(errors)) {
@@ -42,28 +44,37 @@ export default (app) => {
         .findOne(userId);
 
       const keys = Object.keys(user)
-        .filter((key) => !['passwordDigest', 'id'].includes(key));
+        .filter((key) => ![
+          'passwordDigest',
+          'tasksCreator',
+          'tasksExecutor',
+          'id'].includes(key));
 
       return reply.render('users/user', { user, keys });
     })
     .patch('/users/:id', { name: 'users#update' }, async (req, reply) => {
       const userId = req.params.id;
       const { user } = req.body;
-      const userFromDb = await app.orm
-        .getRepository(User)
-        .findOne(userId);
-      userFromDb.email = user.email;
-      userFromDb.firstName = user.firstName;
-      userFromDb.lastName = user.lastName;
-      await userFromDb.save();
+
+      await app.orm
+        .createQueryBuilder()
+        .update(User)
+        .set({ 
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName
+        })
+        .where("id = :id", { id: userId })
+        .execute();
+
       req.flash('info', i18next.t('views.user.accountUpdated'));
-      return reply.redirect(app.reverse('user'));
+      return reply.redirect(`/users/${userId}/edit`);
     })
-    .delete('/users/:userId', { name: 'users#destroy' }, async (req, reply) => {
-      const userId = req.params.id;
+    .delete('/users/:id', { name: 'users#destroy' }, async (req, reply) => {
+      const id = req.params.id;
       const user = await app.orm
         .getRepository(User)
-        .findOne(userId);
+        .findOne(id);
       await user.remove();
       req.session.delete();
       req.flash('info', i18next.t('views.user.accountDeleted'));
@@ -98,8 +109,16 @@ export default (app) => {
         req.flash('error', i18next.t('flash.users.create.wrongConfirmation'));
         return reply.redirect(`/users/${userId}/password`);
       }
-      user.passwordDigest = encrypt(pass.newPass);
-      await user.save();
+
+      await app.orm
+      .createQueryBuilder()
+      .update(User)
+      .set({ 
+        passwordDigest: encrypt(pass.newPass),
+      })
+      .where("id = :id", { id: userId })
+      .execute();
+
       req.flash('info', i18next.t('flash.users.create.passwordChanged'));
       return reply.redirect(`/users/${userId}/edit`);
     });
