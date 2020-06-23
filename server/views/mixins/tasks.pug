@@ -138,16 +138,16 @@ mixin selectAssignedTo(assignedTo)
       if assignedTo
         option.form-control(
           name='assignedTo[id]'
-          value=`${assignedTo}`
+          value=assignedTo.id
           selected=''
-        ) !{users.find((user) => user.id == task.assignedTo).getFullName()}
+        ) !{assignedTo.getFullName()}
       if !assignedTo
         option(
           selected=''
           disabled=''
         )= t('views.tasks.change.assignedto')
       each user in users
-        if user.id != assignedTo
+        if user.id != (assignedTo ? assignedTo.id : null)
           option.form-control(
             name='assignedTo[id]'
             value=user.id
@@ -189,16 +189,16 @@ mixin btnTaskStatus(task)
 mixin btnAssignedToFilter(task, users)
   button.h6.btn.btn-link.shadow-none.border-0.text-dark.my-0.py-0.ml-1.px-0(
     type='submit'
-    form=`myTaskAssignedTo${task.assignedTo}`
-  ) !{users.find((user) => user.id == task.assignedTo).getFullName()}
+    form=`myTaskAssignedTo${task.assignedTo.id}`
+  ) !{task.assignedTo.getFullName()}
     form(
       action=route('tasks#index')
       method='get'
-      id=`myTaskAssignedTo${task.assignedTo}`
+      id=`myTaskAssignedTo${task.assignedTo.id}`
     )
       input(
         name='assignedTo'
-        value=task.assignedTo
+        value=task.assignedTo.id
         type='hidden'
       )
 
@@ -221,7 +221,8 @@ mixin taskCard(task)
                     +btnTaskStatus(task)
                 .d-flex.align-items-center
                   h6.ml-0.my-0= t('views.tasks.tasks.assignedTo')
-                  +btnAssignedToFilter(task, users)
+                  if task.assignedTo
+                    +btnAssignedToFilter(task, users)
               .row.ml-0.mr-0
                 span.d-flex.align-items-top.mt-1
                   .col
@@ -254,7 +255,7 @@ mixin taskCard(task)
               .card-body.pb-1
                 .d-flex.justify-content-end
                   h6= t('views.tasks.tasks.author')
-                  h6 : !{users.find((user) => user.id == task.creator).getFullName()}
+                  h6 : !{task.creator.getFullName()}
 
 mixin filterByUser(users)
   .form-group.col-md-4.mb-2

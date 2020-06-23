@@ -115,7 +115,7 @@ mixin buttonDeleteUser()
             data-dismiss='modal'
           )= t('views.user.delete.save')
           form(
-            action=`users/${reply.request.session.get('userId')}`
+            action=`/users/${currUserId}`
             method='post'
           )
             input(
