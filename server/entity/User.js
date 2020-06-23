@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
 import { IsNotEmpty, IsEmail } from 'class-validator';
+import Task from './Task';
 
 @Entity()
 class User extends BaseEntity {
@@ -24,6 +25,18 @@ class User extends BaseEntity {
   @Column('varchar')
   @IsNotEmpty()
   passwordDigest = '';
+
+  @OneToMany(
+    () => Task,
+    task => task.creator,
+  )
+  tasksCreator = Promise || null;
+
+  @OneToMany(
+    () => Task,
+    task => task.assignedTo,
+  )
+  tasksExecutor = Promise || null;
 
   getFullName () {
     const email = this.email;

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany, JoinTable, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany, JoinTable, ManyToOne } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
 import Tag from './Tag';
 import User from './User';
@@ -19,13 +19,19 @@ class Task extends BaseEntity {
   @IsNotEmpty()
   status = '';
 
-  @OneToOne(() => User)
-  @JoinColumn()
-  @IsNotEmpty()
+  @ManyToOne(
+    () => User,
+    user => user.tasksOwner,
+    { eager: true, cascade: true }
+  )
   creator = Promise;
 
-  @Column('varchar')
-  assignedTo = '';
+  @ManyToOne(
+    () => User,
+    user => user.tasksExecutor,
+    { eager: true, cascade: true }
+  )
+  assignedTo = Promise;
 
   @ManyToMany(
     () => Tag,
