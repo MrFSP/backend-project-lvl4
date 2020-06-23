@@ -31,6 +31,7 @@ const getTags = async (app, newTags) => {
 };
 
 const filterTasks = async (app, filter) => {
+
   const getTagsNames = (tagsNames) => _.words(tagsNames).map(tagName => _.capitalize(tagName));
 
   const query = [
@@ -43,7 +44,8 @@ const filterTasks = async (app, filter) => {
   const tasks = await app.orm
     .createQueryBuilder(Task, 'task')
     .leftJoinAndSelect('task.tags', 'tag')
-    .leftJoinAndSelect('task.creator', 'creator')
+    .leftJoinAndSelect('task.creator', 'tasksCreator')
+    .leftJoinAndSelect('task.assignedTo', 'tasksExecutor')
     .where(
       query,
       {
@@ -71,10 +73,6 @@ export default (app) => {
       const taskStatuses = await app.orm.getRepository(TaskStatus).find();
       const tags = await app.orm.getRepository(Tag).find();
 
-      console.log('tasks');
-      console.log(tasks);
-      console.log(tasks[0].creator);
-
       return reply.render('tasks/index', { tasks, users, taskStatuses, tags });
     })
     .get('/tasks/new', { name: 'tasks#new' }, async (req, reply) => {
@@ -96,7 +94,7 @@ export default (app) => {
       newTask.name = task.name;
       newTask.status = task.status;
       newTask.description = task.description || '';
-      newTask.assignedTo = task.assignedTo || '';
+      newTask.assignedTo = task.assignedTo || null;
       newTask.creator = currentUserId;
 
       const errors = await validate(newTask);
@@ -106,9 +104,6 @@ export default (app) => {
         const taskStatuses = await app.orm.getRepository(TaskStatus).find();
         return reply.render('/tasks/new', { users, taskStatuses, errors });
       }
-
-      console.log('newTasknewTask');
-      console.log(newTask);
 
       await newTask.save();
       return reply.redirect(app.reverse('tasks#index'));
