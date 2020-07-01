@@ -7,6 +7,6 @@ tmp/
 temp/
 database.sqlite
 public/assets
-.env
+.env_copy
 coverage
 dist
