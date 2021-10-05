@@ -63,7 +63,7 @@
       "fastify-reverse-routes": "^1.1.0",
       "fastify-secure-session": "^1.2.0",
       "fastify-session": "^4.0.0",
-      "fastify-static": "^2.7.0",
+      "fastify-static": "^4.2.4",
       "fastify-typeorm": "^2.1.2",
       "http-errors": "^1.7.3",
       "i18next": "^19.4.4",
