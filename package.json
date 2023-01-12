@@ -47,7 +47,7 @@
       "babel-loader": "^8.1.0",
       "bootstrap": "^4.5.0",
       "bootstrap-sass": "^3.4.1",
-      "class-validator": "^0.12.2",
+      "class-validator": "^0.14.0",
       "css-loader": "^3.5.3",
       "cssnano": "^4.1.10",
       "dotenv": "^8.2.0",
